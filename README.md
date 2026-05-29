@@ -1,6 +1,6 @@
 # Agent Workflow Skills
 
-Small, reusable Agent Skills for work that tends to get messy in real projects: research figures, frontend refreshes, design competition entries, and model-assisted decision making.
+Small, reusable Agent Skills for work that tends to get messy in real projects: research figures, frontend refreshes, design entries, model consultation, social research, and security asset searches.
 
 These skills are written for agents that can read a `SKILL.md` file and follow local workflows. They are deliberately plain. A good skill should give the agent the missing procedure, not explain the whole internet back to it.
 
