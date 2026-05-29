@@ -1,0 +1,5 @@
+interface:
+  display_name: "Frontend Refresh Workflow"
+  short_description: "Refresh old frontends without fake UI"
+  default_prompt: "Use $frontend-refresh-workflow to audit this frontend and plan a working refresh."
+

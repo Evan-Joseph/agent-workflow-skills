@@ -1,0 +1,5 @@
+interface:
+  display_name: "Design Competition Entry"
+  short_description: "Plan competition entries from rules to assets"
+  default_prompt: "Use $design-competition-entry to verify this brief and plan the next deliverable."
+

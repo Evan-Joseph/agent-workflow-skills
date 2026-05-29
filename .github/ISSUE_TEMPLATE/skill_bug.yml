@@ -1,0 +1,33 @@
+name: Skill bug
+description: Report a workflow problem in an existing skill.
+title: "[skill bug] "
+labels: ["bug"]
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: Skill
+      description: Which skill is affected?
+      placeholder: "academic-figure-design"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should the skill have made the agent do?
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Add examples, logs, or a short reproduction case. Do not include secrets.
+

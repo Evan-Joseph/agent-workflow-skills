@@ -1,0 +1,32 @@
+name: Skill request
+description: Propose a new skill or a substantial change.
+title: "[skill request] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: task
+    attributes:
+      label: Task
+      description: What recurring task should the skill help with?
+    validations:
+      required: true
+  - type: textarea
+    id: trigger
+    attributes:
+      label: Trigger
+      description: When should an agent use it?
+    validations:
+      required: true
+  - type: textarea
+    id: failure
+    attributes:
+      label: Failure modes
+      description: What does the agent often get wrong without the skill?
+    validations:
+      required: true
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Boundaries
+      description: What should the skill not do?
+

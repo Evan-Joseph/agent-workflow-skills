@@ -1,0 +1,5 @@
+interface:
+  display_name: "Academic Figure Design"
+  short_description: "Plan paper figures and editable rebuilds"
+  default_prompt: "Use $academic-figure-design to turn this figure brief into a prompt package and rebuild plan."
+

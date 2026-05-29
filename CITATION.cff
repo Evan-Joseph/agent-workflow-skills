@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+title: "Agent Workflow Skills"
+message: "If this repository helps your agent workflow or research artifacts, please cite it as software."
+type: software
+authors:
+  - name: "Evan Joseph"
+license: "Apache-2.0"
+
