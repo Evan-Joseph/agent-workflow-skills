@@ -1,0 +1,4 @@
+interface:
+  display_name: "RedNote Research Workflow"
+  short_description: "Use RedNote as weak-signal research"
+  default_prompt: "Use $rednote-research-workflow to collect public social signals for this topic."
