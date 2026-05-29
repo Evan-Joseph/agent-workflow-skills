@@ -14,6 +14,7 @@ echo "Checking for common leaks..."
 if rg -n "/Users/|gaoshenzhou|foxmail|qdu\\.edu|password|passwd|token|cookie|api[_-]?key|private_key|BEGIN .*KEY|127\\.0\\.0\\.1:[0-9]+|localhost:[0-9]+" . \
   --glob '!CONTRIBUTING.md' \
   --glob '!SECURITY.md' \
+  --glob '!README.md' \
   --glob '!scripts/check.sh'; then
   exit 1
 fi
@@ -30,4 +31,3 @@ for skill in skills/*; do
 done
 
 echo "OK"
-

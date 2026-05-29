@@ -1,0 +1,4 @@
+interface:
+  display_name: "Multi-Model Consultation"
+  short_description: "Compare outside model opinions before acting"
+  default_prompt: "Use $multi-model-consultation to build a small model panel for this decision."

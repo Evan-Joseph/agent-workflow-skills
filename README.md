@@ -11,8 +11,22 @@ These skills are written for agents that can read a `SKILL.md` file and follow l
 | `academic-figure-design` | Planning AI-assisted academic figures, then rebuilding final labels, charts, and source images in editable form. |
 | `frontend-refresh-workflow` | Replacing an old frontend with a new prototype while keeping real backend behavior, tests, and project structure intact. |
 | `design-competition-entry` | Turning a design competition brief into a checked workflow: rules, branch, concept, prompts, review, and submission assets. |
+| `multi-model-consultation` | Asking several external models the same question, comparing raw answers, and turning the spread into one grounded recommendation. |
 
 More skills may be added later, but this repository is not meant to become a junk drawer. Each skill needs a clear owner task, a short trigger description, and enough process to prevent common failure modes.
+
+## What stays out
+
+This repository is for reusable public workflows. It is not the place for:
+
+- local machine profiles
+- account-specific login procedures
+- provider-specific billing or balance notes
+- built-in credentials
+- browser profiles, cookies, or session handling
+- workflows tied to private data exports
+
+If a skill only makes sense on one person's machine, it belongs in a private repository or a local-only skill root.
 
 ## Layout
 
@@ -26,6 +40,9 @@ skills/
     references/
     templates/
   design-competition-entry/
+    SKILL.md
+    references/
+  multi-model-consultation/
     SKILL.md
     references/
 ```
