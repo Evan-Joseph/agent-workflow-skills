@@ -13,6 +13,7 @@ These skills are written for agents that can read a `SKILL.md` file and follow l
 | `design-competition-entry` | Turning a design competition brief into a checked workflow: rules, branch, concept, prompts, review, and submission assets. |
 | `multi-model-consultation` | Asking several external models the same question, comparing raw answers, and turning the spread into one grounded recommendation. |
 | `rednote-research-workflow` | Using RedNote/Xiaohongshu as a weak-signal research source for examples, creator language, and lead discovery. |
+| `security-asset-search-workflow` | Planning authorized internet-asset searches, recording evidence, and turning raw results into defensible findings. |
 
 More skills may be added later, but this repository is not meant to become a junk drawer. Each skill needs a clear owner task, a short trigger description, and enough process to prevent common failure modes.
 
@@ -34,6 +35,9 @@ skills/
     SKILL.md
     references/
   rednote-research-workflow/
+    SKILL.md
+    references/
+  security-asset-search-workflow/
     SKILL.md
     references/
 ```

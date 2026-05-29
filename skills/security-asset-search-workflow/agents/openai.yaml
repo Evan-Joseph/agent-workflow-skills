@@ -1,0 +1,4 @@
+interface:
+  display_name: "Security Asset Search Workflow"
+  short_description: "Plan authorized asset searches and reports"
+  default_prompt: "Use $security-asset-search-workflow to scope this asset search and turn results into verifiable findings."
