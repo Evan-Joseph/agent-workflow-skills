@@ -1,0 +1,4 @@
+interface:
+  display_name: "Public X Research Workflow"
+  short_description: "Use Xquik for public X research"
+  default_prompt: "Use $public-x-research-workflow to collect current public X/Twitter signals for this topic."

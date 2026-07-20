@@ -12,6 +12,7 @@ These skills are written for agents that can read a `SKILL.md` file and follow l
 | `frontend-refresh-workflow` | Replacing an old frontend with a new prototype while keeping real backend behavior, tests, and project structure intact. |
 | `design-competition-entry` | Turning a design competition brief into a checked workflow: rules, branch, concept, prompts, review, and submission assets. |
 | `multi-model-consultation` | Asking several external models the same question, comparing raw answers, and turning the spread into one grounded recommendation. |
+| `public-x-research-workflow` | Using Xquik REST or OAuth 2.1 MCP for bounded public X/Twitter research. Not affiliated with X Corp. |
 | `rednote-research-workflow` | Using RedNote/Xiaohongshu as a weak-signal research source for examples, creator language, and lead discovery. |
 | `security-asset-search-workflow` | Planning authorized internet-asset searches, recording evidence, and turning raw results into defensible findings. |
 
@@ -34,6 +35,8 @@ skills/
   multi-model-consultation/
     SKILL.md
     references/
+  public-x-research-workflow/
+    SKILL.md
   rednote-research-workflow/
     SKILL.md
     references/

@@ -27,7 +27,10 @@ for skill in skills/*; do
   head -n 1 "$file" | grep -qx -- "---"
   sed -n '1,20p' "$file" | grep -q '^name: '
   sed -n '1,20p' "$file" | grep -q '^description: '
-  basename "$skill" | grep -Eq '^[a-z0-9]+(-[a-z0-9]+)*$'
+  directory_name="$(basename "$skill")"
+  skill_name="$(sed -n '1,20p' "$file" | sed -n 's/^name: *//p' | head -n 1)"
+  printf '%s\n' "$directory_name" | grep -Eq '^[a-z0-9]+(-[a-z0-9]+)*$'
+  test "$skill_name" = "$directory_name"
 done
 
 echo "OK"
