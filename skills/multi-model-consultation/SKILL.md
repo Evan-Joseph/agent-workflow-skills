@@ -106,6 +106,14 @@ Your final answer should include:
 
 If one model is clearly best for the next step, say so and explain why.
 
+## Optional durable workflow path
+
+Keep the native path above for a small panel that can finish in one session.
+When prompt approval, per-model responses, comparison, retry decisions, and the
+final recommendation need separate durable states, use the
+[LazyMind workflow mapping](references/lazymind-workflow.md). The mapping keeps
+raw responses as distinct artifacts and does not treat panel agreement as proof.
+
 ## Boundaries
 
 - Do not send secrets, live credentials, session data, or private keys to external models.
