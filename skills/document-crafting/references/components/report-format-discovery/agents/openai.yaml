@@ -1,0 +1,7 @@
+interface:
+  display_name: "报告格式发现"
+  short_description: "发现报告结构、章节和证据规范"
+  default_prompt: "Use $report-format-discovery to discover the right structure for this kind of report."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#2563EB"

@@ -1,0 +1,7 @@
+interface:
+  display_name: "MinerU 文档解析"
+  short_description: "用 MinerU 把文档解析为 Markdown 和素材"
+  default_prompt: "Use $mineru-document-parse to convert this PDF, Office document, image, HTML file, or URL to Markdown with MinerU."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#0F766E"

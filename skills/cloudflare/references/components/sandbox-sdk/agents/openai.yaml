@@ -1,0 +1,7 @@
+interface:
+  display_name: "Sandbox SDK 沙箱"
+  short_description: "构建安全代码执行和沙箱应用"
+  default_prompt: "Use $sandbox-sdk to build or review this sandboxed execution feature."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#EA580C"

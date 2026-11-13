@@ -1,0 +1,7 @@
+interface:
+  display_name: "说人话改写"
+  short_description: "自然改写并保护事实、证据与学术语义"
+  default_prompt: "Use $shuorenhua to revise this text naturally while preserving facts, evidence strength, logic, terminology, and register."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#4F46E5"

@@ -1,0 +1,7 @@
+interface:
+  display_name: "论文投稿 Copilot"
+  short_description: "统筹可审计的 CS/AI 论文投稿流程"
+  default_prompt: "Use $paper-publication-copilot to plan an auditable paper submission workflow for this manuscript."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#2563EB"

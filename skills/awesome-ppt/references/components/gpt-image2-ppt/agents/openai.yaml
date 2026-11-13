@@ -1,0 +1,7 @@
+interface:
+  display_name: "GPT Image2 PPT 后端"
+  short_description: "用 gpt-image-2/Grsai 渲染图片式 PPT"
+  default_prompt: "Use $gpt-image2-ppt when this deck specifically needs the gpt-image-2 or Grsai image-slide backend."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#0F766E"

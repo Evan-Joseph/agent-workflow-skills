@@ -1,0 +1,42 @@
+{
+  "name": "agent-workflow-skills",
+  "owner": {
+    "name": "Evan-Joseph",
+    "url": "https://github.com/Evan-Joseph"
+  },
+  "metadata": {
+    "description": "20 production-tested cross-harness AI Agent skills with executable Python toolchains, deterministic quality gates, and domain reference trees for Claude Code, Codex, and Antigravity.",
+    "version": "2.0.0",
+    "license": "Apache-2.0"
+  },
+  "plugins": [
+    {
+      "name": "agent-workflow-skills",
+      "description": "Full suite of 20 cross-platform engineering, academic research, document crafting, frontend UI/UX, browser routing, Cloudflare, and media production skills.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/academic-literature-search",
+        "./skills/agent-reach",
+        "./skills/anysearch",
+        "./skills/awesome-ppt",
+        "./skills/browser-routing",
+        "./skills/chat-history-export",
+        "./skills/cloudflare",
+        "./skills/developer-resource-search",
+        "./skills/document-crafting",
+        "./skills/document-parsing",
+        "./skills/engineering-quality",
+        "./skills/frontend-design",
+        "./skills/image-generation",
+        "./skills/ip-materials",
+        "./skills/linuxdo",
+        "./skills/mobile-device-ops",
+        "./skills/paper-publication-copilot",
+        "./skills/quarkpan-resource-access",
+        "./skills/shuorenhua",
+        "./skills/video-use"
+      ]
+    }
+  ]
+}

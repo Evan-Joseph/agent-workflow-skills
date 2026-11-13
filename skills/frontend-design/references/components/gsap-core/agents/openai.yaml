@@ -1,0 +1,7 @@
+interface:
+  display_name: "GSAP 核心动画"
+  short_description: "使用 GSAP tween、缓动和 DOM 动画"
+  default_prompt: "Use $gsap-core to implement or debug this GSAP animation."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#475569"

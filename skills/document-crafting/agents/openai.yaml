@@ -1,0 +1,7 @@
+interface:
+  display_name: "长文档协作与高保真排版交付"
+  short_description: "PRD/方案长文协作起草、Word/DOCX 规范、Markdown 报告与高质量 PDF 交付"
+  default_prompt: "Use $document-crafting to co-author, review, format, convert, or verify long documents (PRD/RFC/reports), high-fidelity Word, HTML reports, or LaTeX/Docx-to-PDF deliverables."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#0F766E"

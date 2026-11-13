@@ -1,0 +1,7 @@
+interface:
+  display_name: "知识产权申报材料"
+  short_description: "中国软件著作权与发明/实用新型专利交底书全流程编写"
+  default_prompt: "Use $ip-materials to analyze this project or paper and draft Chinese software copyright or patent disclosure materials."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#2563EB"

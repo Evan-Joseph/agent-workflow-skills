@@ -1,0 +1,7 @@
+interface:
+  display_name: "GSAP React 动画"
+  short_description: "在 React 中使用 GSAP hook 和清理模式"
+  default_prompt: "Use $gsap-react to animate this React or Next.js UI with GSAP."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#DB2777"

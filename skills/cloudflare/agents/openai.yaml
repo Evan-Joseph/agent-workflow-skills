@@ -1,0 +1,7 @@
+interface:
+  display_name: "Cloudflare 平台"
+  short_description: "开发和排查 Workers、Pages、存储与 AI"
+  default_prompt: "Use $cloudflare to build or review this Cloudflare application with current docs."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#F38020"

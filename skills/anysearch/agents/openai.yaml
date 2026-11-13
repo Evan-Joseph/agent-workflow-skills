@@ -1,0 +1,7 @@
+interface:
+  display_name: "AnySearch 公共检索"
+  short_description: "搜索公开实时信息、垂直领域资料与跨来源结构化检索结果"
+  default_prompt: "Use $anysearch to search public, non-sensitive, real-time or cross-domain information with source links."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#0891B2"

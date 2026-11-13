@@ -1,0 +1,7 @@
+interface:
+  display_name: "Quark 网盘资源接入"
+  short_description: "通过现有 quarkpan CLI 浏览和受控下载夸克分享资源"
+  default_prompt: "Use $quarkpan-resource-access for Quark share inspection, file discovery, and explicitly approved downloads."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#2563EB"

@@ -1,0 +1,7 @@
+interface:
+  display_name: "文档解析与 OCR"
+  short_description: "提取文本、表格、公式并保留页码来源"
+  default_prompt: "Use $document-parsing to choose a local parser or OCR path and preserve source provenance."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#0F766E"

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Agent Reach 检索"
+  short_description: "路由互联网搜索、网页读取和平台抓取"
+  default_prompt: "Use $agent-reach to collect read-only content; when a browser-backed channel is required, inherit $browser-routing rules: zero focus stealing (headless or silent background creation), named task grouping ([Agent] task) with auto-collapse, immediate tab cleanup, and anti-orphan verification."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#0891B2"

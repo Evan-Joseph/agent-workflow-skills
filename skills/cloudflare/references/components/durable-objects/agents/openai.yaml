@@ -1,0 +1,7 @@
+interface:
+  display_name: "Durable Objects 状态对象"
+  short_description: "构建和审查 Cloudflare Durable Objects"
+  default_prompt: "Use $durable-objects to design or review this Durable Objects implementation."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#EA580C"

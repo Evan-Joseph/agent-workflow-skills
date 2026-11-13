@@ -1,0 +1,7 @@
+interface:
+  display_name: "GSAP 滚动动画"
+  short_description: "实现 ScrollTrigger 滚动触发和 pinning"
+  default_prompt: "Use $gsap-scrolltrigger to build or debug this scroll-triggered animation."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#DB2777"

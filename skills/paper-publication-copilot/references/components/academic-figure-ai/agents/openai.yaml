@@ -1,0 +1,7 @@
+interface:
+  display_name: "学术论文图表"
+  short_description: "生成、重绘和审查 CS/AI 论文图表"
+  default_prompt: "Use $academic-figure-ai to design Image2 prompts and a PPT rebuild plan for paper figures."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#2563EB"

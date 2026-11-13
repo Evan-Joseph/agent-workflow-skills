@@ -1,0 +1,7 @@
+interface:
+  display_name: "项目前端翻新"
+  short_description: "接入真实项目并打磨前端体验"
+  default_prompt: "Use $project-frontend-refresh to modernize this project frontend, wire real behavior, and verify UI polish."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#DB2777"

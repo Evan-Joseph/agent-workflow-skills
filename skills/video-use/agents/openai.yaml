@@ -1,0 +1,7 @@
+interface:
+  display_name: "视频剪辑 Copilot"
+  short_description: "视频剪辑、转录、字幕、调色和成片自检"
+  default_prompt: "Use $video-use to inspect source footage, transcribe audio, draft an EDL, render subtitles, and export a checked final video."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#0F766E"

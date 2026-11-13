@@ -1,0 +1,7 @@
+interface:
+  display_name: "React 组件转换"
+  short_description: "把 Stitch 设计转换为精细 React 组件"
+  default_prompt: "Use $react-components to turn this Stitch design into polished, modular React components."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#149ECA"

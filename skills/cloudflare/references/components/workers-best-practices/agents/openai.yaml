@@ -1,0 +1,7 @@
+interface:
+  display_name: "Workers 最佳实践"
+  short_description: "审查 Cloudflare Workers 生产模式"
+  default_prompt: "Use $workers-best-practices to review this Worker for production issues."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#F38020"

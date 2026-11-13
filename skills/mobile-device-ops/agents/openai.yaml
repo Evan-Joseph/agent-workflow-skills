@@ -1,0 +1,7 @@
+interface:
+  display_name: "四端移动设备运维"
+  short_description: "Android/平板/手机 ADB 运维、降采样截图、系统精简与协议逆向"
+  default_prompt: "Use $mobile-device-ops to inspect and manage connected Android devices (Galaxy S23 Ultra, Xiaoxin Pad 2022, Xiaomi Mi 8), capture downsampled screenshots via adb_ops.py screencap, audit packages, or assist with mobile protocol reverse engineering."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#0EA5E9"

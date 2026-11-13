@@ -1,0 +1,110 @@
+{
+  "name": "agent-workflow-skills",
+  "version": "2.0.0",
+  "description": "20 production-grade cross-harness Agent skills with deterministic Python scripts and quality gates.",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/Evan-Joseph/agent-workflow-skills",
+  "skillsDir": "skills",
+  "skills": [
+    {
+      "name": "academic-literature-search",
+      "path": "skills/academic-literature-search",
+      "description": "搜索、读取、追踪和审计学术资料，包括 ArXiv、Semantic Scholar、PubMed、PMC 开放全文和 Wikipedia。适用于论文调研、文献追踪、引用/被引分析、论文谱系倒读、问题演化线梳理、系统综述/PRISMA 准备、引用存在性核验、claim-source alignment、证据 provenance 记录和技术背景研究。"
+    },
+    {
+      "name": "agent-reach",
+      "path": "skills/agent-reach",
+      "description": "全网公开与社交平台内容抓取、检索与定向研学中枢。支持通过 Agent Reach (`reach-hub` / `omnireach` / `opencli`) 本地工具链获取微信公众号、抖音（视频搜索/博主作品库/高赞评论）、知乎、小红书（XiaoHongShu/RedNote）、Bilibili（搜索/评论/字幕）、Twitter/X、Reddit、V2EX、YouTube 字幕、Jina Reader 网页正文及 8 平台实时热榜雷达。在需要全网跨平台抓取、多源舆情与社区调研时使用。"
+    },
+    {
+      "name": "anysearch",
+      "path": "skills/anysearch",
+      "description": "通过 AnySearch 搜索公开、非敏感的实时信息和跨领域结构化资料。适用于普通网页结果不足，或需要企业、法律、专利、金融、旅行、能源、农业、影视、游戏及跨来源检索时；不用于未发表论文、私有项目、个人数据、凭据或商业秘密。学术论文、GitHub/开发资源和特定平台内容优先使用本机专用 Skills。"
+    },
+    {
+      "name": "awesome-ppt",
+      "path": "skills/awesome-ppt",
+      "description": "用于图片模型渲染式 PPT 制作。Use when the user invokes $awesome-ppt, asks to make polished slides/decks via gpt-image/imagegen, needs a PPTX assembled from rendered slide images, or explicitly requests editable PPT reconstruction."
+    },
+    {
+      "name": "browser-routing",
+      "path": "skills/browser-routing",
+      "description": "所有本机浏览器操作与自动化测试的前置路由总控。规范日常登录态 Chrome（Codex 官方扩展或 9223 持久守护中继）、Localhost Playwright 调试与 Camoufox 调研。强制零焦点抢占（自动化无头/后台静默创建/焦点仿真）、规范任务标签页分组复用与默认折叠、全生命周期一键清理与回读核验，彻底杜绝孤儿标签页与焦点打扰。"
+    },
+    {
+      "name": "chat-history-export",
+      "path": "skills/chat-history-export",
+      "description": "Offline read-only search, archive indexing, contact governance audit, and anti-ban operational guardrails for local WeChat JSON/SQLite archives and QQ (NapCat/OneBot/QCE) exports."
+    },
+    {
+      "name": "cloudflare",
+      "path": "skills/cloudflare",
+      "description": "用于 Cloudflare 平台开发、排障和方案审查，包括 Workers、Pages、KV、D1、R2、Workers AI、Vectorize、Agents SDK、网络、安全和 IaC。"
+    },
+    {
+      "name": "developer-resource-search",
+      "path": "skills/developer-resource-search",
+      "description": "搜索开发者资源，包括GitHub仓库/Issue/代码、Stack Overflow问答、Hacker News讨论和HuggingFace模型/数据集/Space。适用于查开源实现、技术问答、模型资源、代码样例和社区讨论。"
+    },
+    {
+      "name": "document-crafting",
+      "path": "skills/document-crafting",
+      "description": "高保真长文档协作起草、审阅、排版与多格式交付中枢（已融合原 doc-coauthoring 与 report-format-discovery）。覆盖方案/PRD/技术规格/RFC/决策文档协作撰写、报告结构规范发现、Word/Docx 格式规范与 docx-tool (docx_template_tool.py) 零破坏引擎、OnlyOffice 转换、Markdown 转离线排版 HTML 报告、以及基于 LaTeX/Docx 的高质量 PDF 交付。在需要起草或审阅长文档、生成正式公文报告、格式转换或检查排版质量时使用。"
+    },
+    {
+      "name": "document-parsing",
+      "path": "skills/document-parsing",
+      "description": "用于从 PDF、扫描件、图片、表格和 Office/HTML 文档中提取结构化内容、OCR、表格、公式、页码来源和 Markdown 素材。印刷体主力路由至 MinerU 高精度解析与 OCR；手写数学/408 答卷严禁调 paddleocr/tesseract，统一经 crop_exam_sheet.py 做 300 DPI 单题裁剪后多模态盲转写；版式重排、表单填写和最终 PDF 渲染路由至 document-crafting。"
+    },
+    {
+      "name": "engineering-quality",
+      "path": "skills/engineering-quality",
+      "description": "工程质量守护、全栈架构实现、逆向实证与方案澄清中枢（已融合原 fullstack-dev）。包含精简版必要澄清（吸收 grill-me，一次一问附推荐）、轻量设计规格（SDD）、全栈 API/鉴权/数据库/实时通信实现契约、逆向解包先行、非交互子进程与超时模板、Git 提交前隐私扫描与复杂度裁剪。在需求含未知重要分歧、关键方案选型、全栈应用构建、大功能重构或复杂排障时使用。"
+    },
+    {
+      "name": "frontend-design",
+      "path": "skills/frontend-design",
+      "description": "用于直接在代码中构建、重塑或高保真审计生产级 Web 与移动端 UI/UX（含在线测评防失焦 Closed Shadow DOM 悬浮 HUD 与交付前受众自审门禁）。深度集成 Mobbin（60万+ 真实上线 App/Web 界面与交互流对标）、Awwwards SOTM/SOTY（月度/年度标杆站点排版张力与动效 DNA 逆向拆解）、shadcn/ui、transitions.dev、beautifului.dev、beui.dev、rareui.com、ui-ux-pro-max（192 类行业规则 + 79 种风格）与 Impeccable 视觉系统审计。"
+    },
+    {
+      "name": "image-generation",
+      "path": "skills/image-generation",
+      "description": "跨 Harness 的通用图像生成、编辑与本地位图处理中心。原生集成 Grsai API（支持 gpt-image-2, nano-banana 等模型），并包含本地 ImageMagick 格式转换/缩放与系统截图能力。在需要生图、配图、图像尺寸调整或截图取证时使用。"
+    },
+    {
+      "name": "ip-materials",
+      "path": "skills/ip-materials",
+      "description": "知识产权申报材料生成与交底书编写中枢。支持中国软件著作权（软著申请表、60页前后端源码提取、用户操作手册规范排版）以及中国发明/实用新型专利技术交底书（专利点挖掘、权利要求书草案、技术方案与论文转专利 Paper2Patent）全流程生成。"
+    },
+    {
+      "name": "linuxdo",
+      "path": "skills/linuxdo",
+      "description": "LinuxDO 社区数据检索、话题深度读取、热榜追踪与会话交互中枢。原生集成独立会话授权机制（Discourse one_time_password OTP）与 Cloudflare 静默过盾策略，支持全量搜索、指定楼层精准阅读、用户信息查询与板块浏览，不干扰日常桌面浏览器使用。"
+    },
+    {
+      "name": "mobile-device-ops",
+      "path": "skills/mobile-device-ops",
+      "description": "Android ADB multi-device fleet governance, <120KB auto-downsampled screenshot inspection, UI hierarchy XML dumping, safe system debloat redlines, read-only SMS OTP extraction, and mobile reverse-engineering triage."
+    },
+    {
+      "name": "paper-publication-copilot",
+      "path": "skills/paper-publication-copilot",
+      "description": "CS/AI科研论文投稿总控 Skill。用于论文工作区治理、AI辅助论文写作、实验推进、实验审计、claim-evidence 对齐、引用核验、图表复用登记、自我审稿、外部审稿结果合并、返修迭代、rebuttal/response 检查和投稿前门禁。适用于会议论文、期刊论文、Neurocomputing/KBS/Elsevier EM/PRICAI/PRCV/ACL/NeurIPS/ICML/ICLR等投稿与返修流程；不用于自动投稿、自动上传未发表论文或替代作者最终判断。"
+    },
+    {
+      "name": "quarkpan-resource-access",
+      "path": "skills/quarkpan-resource-access",
+      "description": "用于夸克网盘（Quark Cloud Drive）分享链接核查、个人网盘文件检索、分享元数据只读读取及受批资源大文件 Range 断点续传下载（统一通过本机受管 CLI quarkpan-qr 执行）。"
+    },
+    {
+      "name": "shuorenhua",
+      "path": "skills/shuorenhua",
+      "description": "检查和清理中英文文本里的 AI 套路，并覆盖高情商沟通与关系敏感消息起草（已融合原 humane-communication）。适用于已有文本或学术稿件的“去 AI 味”“说人话”“自然一点”“别像模板”“先标问题”改写与审稿，以及论文、摘要、基金、cover letter 和 reviewer response 的保真改写、全稿术语一致性与全文模式审计；同时支持邮件、私信、求助、感谢、拒绝、跟进、导师/合作方沟通与冲突降温的起草和审阅。"
+    },
+    {
+      "name": "video-use",
+      "path": "skills/video-use",
+      "description": "音视频工程、剪辑成片与格式转码中枢。支持基于 ffmpeg 的音视频格式转换、拼接、压缩、GIF 制作、音频提取，以及 Agent 驱动的素材盘点、语音转录、字幕生成、EDL 剪辑、调色与最终成片自检。在需要视频制作、音视频格式转换或媒体素材处理时使用。"
+    }
+  ]
+}

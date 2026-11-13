@@ -1,0 +1,7 @@
+interface:
+  display_name: "学术论文审稿"
+  short_description: "只读审阅论文、返修稿和 rebuttal"
+  default_prompt: "Use $academic-paper-review to review this manuscript or audit my rebuttal response."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#2563EB"

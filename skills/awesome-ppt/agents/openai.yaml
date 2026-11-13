@@ -1,0 +1,7 @@
+interface:
+  display_name: "图片模型 PPT"
+  short_description: "用图片模型生成并组装精美 PPT"
+  default_prompt: "Use $awesome-ppt to create an image-first PPT deck; choose standard mode by default and editable mode only when native reconstruction is required."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#0F766E"

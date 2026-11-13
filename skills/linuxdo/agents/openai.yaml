@@ -1,0 +1,7 @@
+interface:
+  display_name: "LinuxDO 社区检索"
+  short_description: "通过独立 OTP 会话与 Cloudflare 静默过盾策略检索、阅读 LinuxDO 社区话题与热榜"
+  default_prompt: "Use $linuxdo to search LinuxDO topics, read specific posts/replies, inspect hot/latest topics, or query user profiles via the isolated OTP session without disrupting desktop browser login state."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#2563EB"

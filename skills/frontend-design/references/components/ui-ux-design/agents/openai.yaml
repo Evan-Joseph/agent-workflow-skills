@@ -1,0 +1,7 @@
+interface:
+  display_name: "UI/UX 设计"
+  short_description: "设计系统、交互体验和界面打磨"
+  default_prompt: "Use $ui-ux-design to critique, design, or polish this interface."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#DB2777"

@@ -1,0 +1,7 @@
+interface:
+  display_name: "浏览器路由"
+  short_description: "选择本机浏览器路线，零抢占焦点静默交互，管理标签页分组复用与全生命周期防孤儿收尾"
+  default_prompt: "Use $browser-routing to select the browser owner, enforce zero focus stealing (headless by default or silent background creation via 9223 daemon with focus emulation), manage tabs inside named groups ([Agent] task) with group reuse and auto-collapse, prioritize in-place tab reuse over new tabs, and execute clean exit/cleanup verification to eliminate orphan tabs."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#EA580C"

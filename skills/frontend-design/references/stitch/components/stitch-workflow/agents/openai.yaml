@@ -1,0 +1,7 @@
+interface:
+  display_name: "Stitch 工作流"
+  short_description: "管理 Stitch 生成、复现和交付记录"
+  default_prompt: "Use $stitch-workflow to coordinate this Stitch prototype workflow and verify UI polish."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#DB2777"

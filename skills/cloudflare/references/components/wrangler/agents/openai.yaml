@@ -1,0 +1,7 @@
+interface:
+  display_name: "Wrangler 部署"
+  short_description: "操作 Cloudflare Workers 相关资源"
+  default_prompt: "Use $wrangler before running Wrangler commands for this Cloudflare project."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#F38020"

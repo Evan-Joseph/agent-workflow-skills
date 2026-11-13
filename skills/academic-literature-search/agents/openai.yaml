@@ -1,0 +1,7 @@
+interface:
+  display_name: "学术文献检索"
+  short_description: "检索、追踪和核验学术文献"
+  default_prompt: "Use $academic-literature-search to find papers, trace citations, run PRISMA-style searches, or audit citation support."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#2563EB"
