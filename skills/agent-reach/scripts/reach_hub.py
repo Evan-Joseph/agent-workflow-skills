@@ -101,7 +101,37 @@ def _is_empty_or_error_body(text: str, min_chars: int = 20) -> bool:
     return any(m in head for m in error_markers)
 
 
+_CDP_PORT_SYNCED = False
+
+
+def _sync_chrome_active_port_once() -> None:
+    global _CDP_PORT_SYNCED
+    if _CDP_PORT_SYNCED:
+        return
+    _CDP_PORT_SYNCED = True
+    src = Path.home() / "Library/Application Support/Google/Chrome/DevToolsActivePort"
+    dst = Path.home() / ".local/state/chrome-cdp-daemon/DevToolsActivePort"
+    try:
+        st = src.stat()
+        lines = [ln.strip() for ln in src.read_text("utf-8").splitlines() if ln.strip()]
+        if len(lines) >= 2 and lines[1].lstrip("/").startswith("devtools/browser/"):
+            port = int(lines[0])
+            ws_path = lines[1] if lines[1].startswith("/") else f"/{lines[1]}"
+            mtime_ms = int(st.st_mtime * 1000)
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            content = f"{port}\n{ws_path}\n{mtime_ms}\n"
+            tmp = dst.with_name(f".DevToolsActivePort.tmp.{os.getpid()}")
+            fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                fh.write(content)
+            os.chmod(tmp, 0o600)
+            os.replace(tmp, dst)
+    except Exception:
+        pass
+
+
 def cdp_request(path: str, payload: dict[str, Any] | None = None, method: str = "POST", timeout: float = 20.0) -> dict[str, Any]:
+    _sync_chrome_active_port_once()
     data = json.dumps(payload or {}).encode("utf-8") if method == "POST" else None
     req = urllib.request.Request(
         f"{CDP_BASE}{path}",

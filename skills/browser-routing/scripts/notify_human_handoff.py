@@ -475,6 +475,28 @@ def run_handoff(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
         remove_notification(notifier_bin, args.group)
         return 0, {"ok": True, "status": "removed", "group": args.group}
 
+    if getattr(args, "cdp_approval_alert", False):
+        group_id = args.group or "chrome-cdp-remote-debug-approval"
+        title = args.title or "Chrome 远程调试需点一次允许"
+        subtitle = args.subtitle or "${CDP_RELAY_HOST} 持久中继 · 单连接不叠窗"
+        message = (
+            args.message
+            or "后台任务请求建立唯一 Chrome 远程调试持久连接，点击横幅切至 Chrome 点选一次「允许」后自动恢复。"
+        )
+        exec_cmd = f'/usr/bin/open -a "{CHROME_APP}"'
+        send_notification(
+            notifier_bin,
+            group_id=group_id,
+            title=title,
+            subtitle=subtitle,
+            message=message,
+            execute_cmd=exec_cmd,
+            content_image=pathlib.Path(args.content_image) if args.content_image else DEFAULT_SHIELD_IMAGE,
+            explicit_content_image=bool(args.content_image),
+            sound="none" if args.no_sound else args.sound,
+        )
+        return 0, {"ok": True, "status": "cdp_approval_notified", "group": group_id}
+
     if args.focus_target:
         focus_group = args.group or f"agent-handoff-{args.focus_target[:12]}"
         remove_notification(notifier_bin, focus_group)
@@ -679,6 +701,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--exit-nonzero-on-timeout", action="store_true", help="Exit with code 124 on timeout instead of 0")
     p.add_argument("--no-poll", action="store_true", help="Send notification only and return immediately without polling")
     p.add_argument("--remove-only", action="store_true", help="Remove an existing notification by --group and exit")
+    p.add_argument("--cdp-approval-alert", action="store_true", help="Send single deduplicated Chrome remote-debugging approval notification and exit")
     p.add_argument("--focus-target", help=argparse.SUPPRESS)
     return p
 

@@ -18,6 +18,7 @@ metadata:
   ```bash
   python3 -c "import camoufox; print('camoufox runtime ok')"
   python3 $HOME/.agents/skills/browser-routing/scripts/camoufox_profile.py status
+  cdp-ctl sync-endpoint
   python3 $HOME/.agents/skills/browser-routing/scripts/notify_human_handoff.py --help
   ```
 - **Agent 防呆红线**：
@@ -31,9 +32,9 @@ metadata:
    - 唯一合法默认控制器：**Codex 官方 Chrome 扩展**。具体入口必须以当前会话实际提供的官方浏览器工具文档为准，不得假定 `agent.browsers` 一定存在。
    - 复用当前 Profile、Cookie、登录态与扩展，无需频繁弹框授权。
    - 严禁其他 Harness（如 Claude Code / Oh-My-Pi (omp / PI-Desktop) / Devin / Gemini / Antigravity 等）未经用户明确点名授权擅自并发附着主力 Chrome。
-   - **CDP 自动化唯一合法中继：`${CDP_RELAY_URL}`（零弹窗持久守护中继）**：
-     - **底层根因与防弹窗铁律**：Chrome 128+/144+ 开启远程调试后，**每一次外部新建 WebSocket 调试握手都会在 Chrome 前台强制弹出一次“Allow remote debugging connection?”确认框**。
-     - **单一持久守护**：系统已部署标准基础服务 `com.agents.chrome-cdp-daemon`（基于 `$HOME/.agents/scripts/chrome_cdp_daemon.js`，开机常驻），维持与底层 Chrome 调试端点的**唯一单条持久 WebSocket 长连接**。
+   - **CDP 自动化唯一合法中继：`${CDP_RELAY_URL}`（`v3` 零弹窗防叠窗持久守护中继 + `cdp-ctl` 端点同步）**：
+     - **底层根因与防弹窗铁律**：Chrome 128+/157+ 开启远程调试后，**每一次外部新建 WebSocket 调试握手都会在 Chrome 前台弹出“Allow remote debugging connection?”确认框**，且 `~/Library/Application Support/Google/Chrome/DevToolsActivePort` 受 macOS `com.apple.macl` 保护无法由无 GUI 授权的后台守护进程直接读取。
+     - **单一持久守护与 `cdp-ctl` 桥接**：系统常驻 `com.agents.chrome-cdp-daemon`（`$HOME/.agents/scripts/chrome_cdp_daemon.js` **v3**），内置按需惰性连接（`lazyConnect`）、macOS `CGSSessionScreenIsLocked` 锁屏零握手快返 `503 screen_locked_cdp_deferred` 以及 **`AUTH_PENDING_LATCH` 单次授权熔断锁**（用户未点允许前拒绝并发重拨，返回 `503 cdp_remote_debugging_approval_pending`，彻底杜绝层层叠窗）；当 Chrome 重启更换随机端口时，在已获授权的终端/Agent 环境运行 `cdp-ctl sync-endpoint`（将端点镜像至 `0600` `~/.local/state/chrome-cdp-daemon/DevToolsActivePort` 并 `POST ${CDP_RELAY_URL}/endpoint` 实时注入）。
      - **严禁直连短脚本**：**严禁任何 Harness 编写短生命周期直连脚本（如 `node cdp.js`、`python -c "connect_over_cdp"`、每次动作 `ws.close()`）绕过 9223 直接拨号底层调试端口反复断连重连**！
      - **统一调用规范**：所有 Agent（Antigravity、Claude Code、Codex、Oh-My-Pi (omp / PI-Desktop)、Devin、ARTEX 等）如需通过 CDP 操作日常 Chrome 标签页，**一律统一调用本地守护 HTTP 接口（`${CDP_RELAY_HOST}`）**，零弹窗、零中断、微秒级响应：
        ```bash
