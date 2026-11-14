@@ -9,12 +9,12 @@
     {
       "name": "academic-literature-search",
       "path": "skills/academic-literature-search",
-      "description": "搜索、读取、追踪和审计学术资料，包括 ArXiv、Semantic Scholar、PubMed、PMC 开放全文和 Wikipedia。适用于论文调研、文献追踪、引用/被引分析、论文谱系倒读、问题演化线梳理、系统综述/PRISMA 准备、引用存在性核验、claim-source alignment、证据 provenance 记录和技术背景研究。"
+      "description": "搜索、读取、追踪和审计学术资料，包括 OpenAlex、DBLP、ArXiv、Semantic Scholar、Crossref、PubMed、PMC 开放全文和 Wikipedia。适用于论文调研、文献追踪、论文谱系倒读、系统综述/PRISMA 准备、引用存在性核验、claim-source alignment 与证据 provenance 记录。"
     },
     {
       "name": "agent-reach",
       "path": "skills/agent-reach",
-      "description": "全网公开与社交平台内容抓取、检索与定向研学中枢。支持通过 Agent Reach (`reach-hub` / `omnireach` / `opencli`) 本地工具链获取微信公众号、抖音（视频搜索/博主作品库/高赞评论）、知乎、小红书（XiaoHongShu/RedNote）、Bilibili（搜索/评论/字幕）、Twitter/X、Reddit、V2EX、YouTube 字幕、Jina Reader 网页正文及 8 平台实时热榜雷达。在需要全网跨平台抓取、多源舆情与社区调研时使用。"
+      "description": "全网公开与社交平台内容抓取、检索与定向研学中枢。支持通过 Agent Reach (`reach-hub` / `omnireach` / `opencli`) 本地工具链获取微信公众号、抖音（视频搜索/博主作品库/高赞评论）、知乎、小红书（XiaoHongShu/RedNote）、Bilibili（搜索/评论/字幕）、Twitter/X、Reddit、V2EX、YouTube 字幕、Jina Reader 网页正文及 8 平台实时热榜雷达。"
     },
     {
       "name": "anysearch",
@@ -24,12 +24,12 @@
     {
       "name": "awesome-ppt",
       "path": "skills/awesome-ppt",
-      "description": "用于图片模型渲染式 PPT 制作。Use when the user invokes $awesome-ppt, asks to make polished slides/decks via gpt-image/imagegen, needs a PPTX assembled from rendered slide images, or explicitly requests editable PPT reconstruction."
+      "description": "用于图片模型渲染式 PPT 制作与可编辑重构。Use when the user invokes $awesome-ppt, asks to make polished slides/decks via gpt-image/imagegen, needs a PPTX assembled from rendered slide images, or explicitly requests editable PPT reconstruction."
     },
     {
       "name": "browser-routing",
       "path": "skills/browser-routing",
-      "description": "所有本机浏览器操作与自动化测试的前置路由总控。规范日常登录态 Chrome（Codex 官方扩展或 9223 持久守护中继）、Localhost Playwright 调试与 Camoufox 调研。强制零焦点抢占（自动化无头/后台静默创建/焦点仿真）、规范任务标签页分组复用与默认折叠、全生命周期一键清理与回读核验，彻底杜绝孤儿标签页与焦点打扰。"
+      "description": "所有本机浏览器操作与自动化测试的前置路由总控。规范日常登录态 Chrome（:9223 v4 持久守护中继 + cdp-ctl 语义分组）、Localhost Playwright 调试与 Camoufox 调研。强制零焦点抢占、大模型按任务语义自拟折叠标签组、openerId 子弹窗自动继承与收尾零残留。"
     },
     {
       "name": "chat-history-export",
@@ -39,7 +39,7 @@
     {
       "name": "cloudflare",
       "path": "skills/cloudflare",
-      "description": "用于 Cloudflare 平台开发、排障和方案审查，包括 Workers、Pages、KV、D1、R2、Workers AI、Vectorize、Agents SDK、网络、安全和 IaC。"
+      "description": "用于 Cloudflare 平台开发、排障和方案审查，包括 Workers、Pages、KV、D1、R2、Durable Objects、Workers AI、Vectorize、Agents SDK、网络、安全和 IaC。"
     },
     {
       "name": "developer-resource-search",
@@ -59,12 +59,12 @@
     {
       "name": "engineering-quality",
       "path": "skills/engineering-quality",
-      "description": "工程质量守护、全栈架构实现、逆向实证与方案澄清中枢（已融合原 fullstack-dev）。包含精简版必要澄清（吸收 grill-me，一次一问附推荐）、轻量设计规格（SDD）、全栈 API/鉴权/数据库/实时通信实现契约、逆向解包先行、非交互子进程与超时模板、Git 提交前隐私扫描与复杂度裁剪。在需求含未知重要分歧、关键方案选型、全栈应用构建、大功能重构或复杂排障时使用。"
+      "description": "工程质量守护、全栈架构实现、逆向实证与方案澄清中枢。包含精简版必要澄清（吸收 grill-me，一次一问附推荐）、轻量设计规格（SDD）、全栈最小实现契约、逆向解包先行、非交互子进程与超时规范、Git 提交前隐私扫描与复杂度裁剪。"
     },
     {
       "name": "frontend-design",
       "path": "skills/frontend-design",
-      "description": "用于直接在代码中构建、重塑或高保真审计生产级 Web 与移动端 UI/UX（含在线测评防失焦 Closed Shadow DOM 悬浮 HUD 与交付前受众自审门禁）。深度集成 Mobbin（60万+ 真实上线 App/Web 界面与交互流对标）、Awwwards SOTM/SOTY（月度/年度标杆站点排版张力与动效 DNA 逆向拆解）、shadcn/ui、transitions.dev、beautifului.dev、beui.dev、rareui.com、ui-ux-pro-max（192 类行业规则 + 79 种风格）与 Impeccable 视觉系统审计。"
+      "description": "用于直接在代码中构建、重塑或高保真审计生产级 Web 与移动端 UI/UX。深度集成 Mobbin（真实商业产品交互流对标）、Awwwards SOTM/SOTY（排版张力与动效 DNA 拆解）、shadcn/ui、transitions.dev、beautifului.dev、beui.dev、rareui.com 与 Impeccable 视觉系统审计。"
     },
     {
       "name": "image-generation",
@@ -99,7 +99,7 @@
     {
       "name": "shuorenhua",
       "path": "skills/shuorenhua",
-      "description": "检查和清理中英文文本里的 AI 套路，并覆盖高情商沟通与关系敏感消息起草（已融合原 humane-communication）。适用于已有文本或学术稿件的“去 AI 味”“说人话”“自然一点”“别像模板”“先标问题”改写与审稿，以及论文、摘要、基金、cover letter 和 reviewer response 的保真改写、全稿术语一致性与全文模式审计；同时支持邮件、私信、求助、感谢、拒绝、跟进、导师/合作方沟通与冲突降温的起草和审阅。"
+      "description": "检查和清理中英文文本里的 AI 套路，并覆盖高情商沟通与关系敏感消息起草。适用于已有文本或学术稿件的“去 AI 味”“说人话”“自然一点”“先标问题”改写与审稿，以及论文、摘要、基金、cover letter 和 reviewer response 的保真改写、全稿术语一致性与全文模式审计；同时支持邮件、私信、求助、感谢、拒绝、跟进、导师/合作方沟通与冲突降温的起草和审阅。"
     },
     {
       "name": "video-use",

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Deterministic :9223 Chrome CDP Relay Controller & DevToolsActivePort Syncer (`cdp_ctl.py`).
+"""Deterministic :9223 Chrome CDP v4 Relay Controller & DevToolsActivePort Syncer (`cdp_ctl.py`).
 
 Bridges macOS `com.apple.macl` app-data isolation between GUI-parented Agent shells
 (which can read `~/Library/Application Support/Google/Chrome/DevToolsActivePort`) and
 `launchd`-spawned `com.agents.chrome-cdp-daemon` (`${CDP_RELAY_HOST}`), atomically syncing
 `0600` `~/.local/state/chrome-cdp-daemon/DevToolsActivePort` and `POST /endpoint` before
-issuing `:9223` relay commands.
+issuing `:9223` v4 semantic-grouping commands (`open` / `navigate` / `eval` / `text` / `cleanup`).
 """
 
 from __future__ import annotations
@@ -148,8 +148,18 @@ def sync_devtools_endpoint(
     }
 
 
+def _add_open_args(p_open: argparse.ArgumentParser) -> None:
+    p_open.add_argument("--url", required=True, help="Target URL to open in background")
+    p_open.add_argument("--task", default="default", help="Task identifier for lifecycle & /cleanup")
+    p_open.add_argument("--group", default="", help="Concise 2-8 char semantic tab-group label (e.g. '推免名册', '小红书检索')")
+    p_open.add_argument("--reuse", action="store_true", help="Reuse an existing tab belonging to the same --task")
+    p_open.add_argument("--resident", action="store_true", help="Extend idle TTL (2h) within the same semantic group until /cleanup")
+    p_open.add_argument("--keep-for-user", action="store_true", help="Leave tab open for user inspection after /cleanup")
+    p_open.add_argument("--ttl-ms", type=int, default=0, help="Custom ephemeral idle TTL in ms")
+
+
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(description="Manage :9223 Chrome CDP relay & sync DevToolsActivePort")
+    p = argparse.ArgumentParser(description="Manage :9223 Chrome CDP v4 relay & sync DevToolsActivePort")
     p.add_argument("--cdp-url", default=DEFAULT_CDP_URL, help="Relay base URL (default: ${CDP_RELAY_URL})")
     sub = p.add_subparsers(dest="cmd", required=True)
 
@@ -160,18 +170,18 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("tabs", help="Sync endpoint (if readable) and query GET /tabs")
     sub.add_parser("reconnect", help="Sync endpoint and trigger POST /reconnect")
 
-    p_new = sub.add_parser("new", help="Create or reuse background [Agent] tab via POST /new")
-    p_new.add_argument("--url", required=True)
-    p_new.add_argument("--task", default="default")
-    p_new.add_argument("--group", default="")
-    p_new.add_argument("--reuse", action="store_true")
-    p_new.add_argument("--ttl-ms", type=int, default=0)
+    p_open = sub.add_parser("open", help="Open or reuse background tab inside a collapsed semantic tab group")
+    _add_open_args(p_open)
 
-    p_nav = sub.add_parser("navigate", help="Navigate an [Agent] tab via POST /navigate")
+    p_new = sub.add_parser("new", help="Alias for `open`")
+    _add_open_args(p_new)
+
+    p_nav = sub.add_parser("navigate", help="Navigate a managed tab via POST /navigate")
     p_nav.add_argument("--url", required=True)
     p_nav.add_argument("--target-id", default="")
     p_nav.add_argument("--url-sub", default="")
     p_nav.add_argument("--task", default="default")
+    p_nav.add_argument("--group", default="")
 
     p_eval = sub.add_parser("eval", help="Evaluate JS expression via POST /eval")
     p_eval.add_argument("--expression", required=True)
@@ -184,10 +194,16 @@ def build_parser() -> argparse.ArgumentParser:
     p_txt.add_argument("--url-sub", default="")
     p_txt.add_argument("--task", default="")
 
-    p_clean = sub.add_parser("cleanup", help="Close ephemeral [Agent] tabs via POST /cleanup")
+    p_close = sub.add_parser("close", help="Close a single managed tab (and any child popups) via POST /close")
+    p_close.add_argument("--target-id", default="")
+    p_close.add_argument("--url-sub", default="")
+
+    p_clean = sub.add_parser("cleanup", help="Close all tabs + child popups for a task/group via POST /cleanup")
     p_clean.add_argument("--task", default="")
+    p_clean.add_argument("--group", default="")
     p_clean.add_argument("--target-id", default="")
     p_clean.add_argument("--all-agents", action="store_true")
+    p_clean.add_argument("--include-keep-for-user", action="store_true")
 
     return p
 
@@ -199,7 +215,6 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(res, ensure_ascii=False, indent=2))
         return 0 if res.get("ok") else 1
 
-    # Auto-sync DevToolsActivePort transparently before any :9223 command
     sync_devtools_endpoint(args.cdp_url, notify_daemon=True, connect=False)
 
     if args.cmd == "health":
@@ -208,8 +223,14 @@ def main(argv: list[str] | None = None) -> int:
         code, data = cdp_http_json(args.cdp_url, "/tabs", method="GET")
     elif args.cmd == "reconnect":
         code, data = cdp_http_json(args.cdp_url, "/reconnect", {})
-    elif args.cmd == "new":
-        pl: dict[str, Any] = {"url": args.url, "task": args.task, "reuse": bool(args.reuse)}
+    elif args.cmd in ("open", "new"):
+        pl: dict[str, Any] = {
+            "url": args.url,
+            "task": args.task,
+            "reuse": bool(args.reuse),
+            "resident": bool(args.resident),
+            "keepForUser": bool(args.keep_for_user),
+        }
         if args.group:
             pl["group"] = args.group
         if args.ttl_ms > 0:
@@ -221,6 +242,8 @@ def main(argv: list[str] | None = None) -> int:
             pl["targetId"] = args.target_id
         if args.url_sub:
             pl["urlSub"] = args.url_sub
+        if args.group:
+            pl["group"] = args.group
         code, data = cdp_http_json(args.cdp_url, "/navigate", pl)
     elif args.cmd == "eval":
         pl = {"expression": args.expression}
@@ -240,10 +263,22 @@ def main(argv: list[str] | None = None) -> int:
         if args.task:
             pl["task"] = args.task
         code, data = cdp_http_json(args.cdp_url, "/text", pl, timeout=25.0)
+    elif args.cmd == "close":
+        pl = {}
+        if args.target_id:
+            pl["targetId"] = args.target_id
+        if args.url_sub:
+            pl["urlSub"] = args.url_sub
+        code, data = cdp_http_json(args.cdp_url, "/close", pl)
     elif args.cmd == "cleanup":
-        pl = {"allAgents": bool(args.all_agents)}
+        pl = {
+            "allAgents": bool(args.all_agents),
+            "includeKeepForUser": bool(args.include_keep_for_user),
+        }
         if args.task:
             pl["task"] = args.task
+        if args.group:
+            pl["group"] = args.group
         if args.target_id:
             pl["targetId"] = args.target_id
         code, data = cdp_http_json(args.cdp_url, "/cleanup", pl)

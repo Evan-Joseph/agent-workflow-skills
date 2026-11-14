@@ -148,6 +148,8 @@ python3 $HOME/.agents/skills/chat-history-export/scripts/vault_cli.py digest-sou
 
 ## 3. QQ / OneBot Read-Only Governance (`scripts/napcat_api.py`)
 
+Favor human-centered contact maintenance over mechanical point-scoring: inspect each person's conversation context, write one concise natural-language memory remark (who they are + shared context/collaboration, searchable by LLMs), and keep simple intuitive groups.
+
 ```bash
 # Read-only audit of unremarked friends and category distribution
 python3 $HOME/.agents/skills/chat-history-export/scripts/napcat_api.py contacts-audit --format markdown
@@ -291,20 +293,20 @@ Before attaching dynamic instrumentation (`frida-server`), identify the applicat
 def sanitize_cloudflare_skill_md(text: str) -> str:
     """Replace the personal 12-asset ledger in cloudflare/SKILL.md with general production safety gates."""
     pattern = re.compile(
-        r"## 本机 Cloudflare 资产台账与变更安全门禁 \(Asset Ledger & Destructive Action Gate\)\n.*?(?=\n## Retrieval Sources)",
+        r"## (?:一、 )?本机(?: Cloudflare| 12 项生产)?资产[^\n]*\n.*?(?=\n(?:## Retrieval Sources|### 一键只读健康度))",
         re.S,
     )
-    replacement = """## Production Safety & Quota Governance Gates
+    replacement = """## 一、 生产变更安全门禁与 DO 休眠配额治理
 
-- **Five Mandatory Operational Gates**:
-  1. **Explicit Confirmation Before Destructive Commands**: Before running `wrangler delete`, `wrangler pages project delete`, `wrangler d1/kv/r2 delete`, `cloudflared tunnel delete`, or `DELETE` REST calls, present a complete impact table (exact asset name, resource type, bound custom domains, last deployment timestamp, and proposed action) and obtain explicit user confirmation;
-  2. **Do Not Redeploy Archived Projects**: Keep completed historical showcase projects frozen; never run `wrangler deploy` or mutate `wrangler.toml` inside archived directories without explicit instruction;
-  3. **Post-Deploy HTTP 200 Verification Gate**: After deploying or migrating Pages / Workers, run `curl -ILs` against production endpoints to confirm `HTTP 200` (preventing `HTTP 522` or `HTTP 403 Error 1014` dangling CNAMEs) and bump Service Worker cache versions when applicable;
-  4. **Free-Tier Quota & Durable Objects WebSocket Hibernation Gate**: Cloudflare's Free plan caps Durable Objects active duration at `101,562.5` seconds (`~28.21 DO-hours/day`). Any long-lived WebSocket coordinator **must** use the Hibernation API (`this.ctx.acceptWebSocket(ws, tags)`, `this.ctx.getWebSockets(tag)`, and `this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("PING", "PONG"))`) with client text `"PING"` intervals `>= 45s` so idle connections consume zero active duration;
-  5. **Strict Separation of `wrangler pages deploy` vs. `wrangler deploy`**: Inspect project structure (`pages_dist/` / `_worker.js` vs. standalone Worker `main` entry) before deploying so Pages and Workers targets are never cross-deployed.
+1. **破坏性操作显式确认门禁**：执行 `wrangler delete`、`wrangler pages project delete`、`wrangler d1/kv/r2 delete`、`cloudflared tunnel delete` 或 REST `DELETE` 前，列出「精确资产名、资源类型、绑定自定义域名、最后部署时间、拟执行动作」完整影响表，获用户本回合确认后方可执行；
+2. **禁止重部署已归档项目**：历史归档展示项目保持冻结，未经明确指示不运行 `wrangler deploy` 或修改 `wrangler.toml`；
+3. **Durable Objects 强制休眠零计费（`28.21 DO-小时/天` 免费红线）**：免费版每日 DO 活跃时长限额 `101,562.5s`（`~28.21 DO-h/day`）。长连接 WebSocket 协调器统一采用 Hibernation API（`this.ctx.acceptWebSocket(ws, tags)`、`this.ctx.getWebSockets(tag)` 与 `this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("PING", "PONG"))`），客户端文本 `"PING"` 间隔 `>= 45s`，确保空闲连接零活跃时长计费；
+4. **严格区分 `wrangler pages deploy` 与 `wrangler deploy`**：部署前核对项目目录结构（Pages 静态产物/`_worker.js` vs 独立 Worker `main` 入口），防止混调；
+5. **部署后 `HTTP 200` 实测门禁**：部署或迁移域名后执行 `curl -ILs` 确认生产端点返回 `HTTP 200`（防止 `HTTP 522` 或 `HTTP 403 Error 1014` 悬空 CNAME），并按需更新 Service Worker 缓存版本。
 """
-    out, n = pattern.subn(replacement, text, count=1)
+    out, _ = pattern.subn(replacement, text, count=1)
     out = out.replace("Cloudflare 平台开发、12项生产资产门禁与休眠配额治理", "Cloudflare 平台开发、变更安全门禁与 DO 休眠配额治理")
+    out = out.replace("Cloudflare 平台开发、12项生产资产门禁与DO休眠配额治理", "Cloudflare 平台开发、变更安全门禁与 DO 休眠配额治理")
     return out
 
 
@@ -570,7 +572,7 @@ def sanitize_common_text(text: str) -> str:
     # 1. Interpreter paths -> python3
     if uhome:
         text = re.sub(
-            rf"{re.escape(uhome)}/(?:miniconda3|\.agents/runtimes/[A-Za-z0-9_.-]+/\.venv|\.agents/tools/[A-Za-z0-9_./-]+/\.venv|\.local/share/uv/tools/[A-Za-z0-9_.-]+)/bin/python[0-9.]*",
+            rf"{re.escape(uhome)}/(?:miniconda3|\.agents/runtimes/[A-Za-z0-9_.-]+/\.venv|\.agents/tools/[A-Za-z0-9_./-]+/\.venv|\.local/share/uv/tools/[A-Za-z0-9_.-]+|\.local/src/[A-Za-z0-9_.-]+/\.venv)/bin/python[0-9.]*",
             "python3",
             text,
         )

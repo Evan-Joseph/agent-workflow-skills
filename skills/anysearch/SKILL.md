@@ -31,8 +31,7 @@ metadata:
 - 多平台公开内容（含小红书、抖音、知乎、B站）、微信公众号永久直链与腾讯元宝搜索（`so.qq.com` `media`/`gov`/`weixin_article`/`xueshu`）：`agent-reach`（`reach-hub wechat search` / `reach-hub xiaohongshu` / `reach-hub so-qq`）
 - 用户登录态、已有 Chrome 标签或交互网页：`browser-routing`
 
-AnySearch 自身不应打开浏览器标签页。若核验原始来源必须升级到浏览器，先加载
-`browser-routing`，执行零焦点抢占规范（无头或静默后台创建），在命名任务分组（`[Agent] 任务名`）内创建并默认折叠，优先原地复用，用完立即显式关闭中间页，最终只保留明确的 deliverable 或等待用户操作的 handoff，收尾执行清理回读杜绝孤儿标签页。
+AnySearch 自身不应打开浏览器标签页。若核验原始来源必须升级到浏览器，先加载 `browser-routing`，通过 `cdp-ctl open --task <id> --group "<简洁语义组名>"` 在后台折叠语义分组内静默访问，任务结束调用 `cdp-ctl cleanup --task <id>` 确保零孤儿标签残留。
 
 使用 AnySearch 的典型情况：
 

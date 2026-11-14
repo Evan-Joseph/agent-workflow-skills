@@ -10,7 +10,7 @@ subtitles, high-like comments, and hotlist radar across:
 - 知乎 (Zhihu: :9223 api/v4/search_v3 & native DOM search, article/question read via Jina + :9223, high-vote comments)
 - Twitter/X (:9223 authenticated X DOM search + zero-login Syndication @handle timeline & tweet read)
 - Reddit (official reddit.com /search/ via :9223 + Arctic Shift API full post & comment tree)
-- 吾爱破解 (52pojie: RSS, guide hot/digest/newthread, strict-domain AnySearch site:52pojie.cn, :9223 persistent-tab read)
+- 吾爱破解 (52pojie: RSS, guide hot/digest/newthread, strict-domain AnySearch site:52pojie.cn, :9223 ephemeral-tab read)
 - V2EX (v2ex: official hot/latest/show JSON API + first-party SOV2EX search API)
 - YouTube (yt-dlp ytsearch + VTT subtitle extraction)
 - 跨平台热榜雷达 (Hotlist Radar: Weibo, Douyin, Zhihu, Xiaohongshu, Bilibili, Baidu, V2EX, HN)
@@ -143,12 +143,35 @@ def cdp_request(path: str, payload: dict[str, Any] | None = None, method: str = 
         return json.loads(resp.read().decode("utf-8", errors="replace"))
 
 
+TASK_SEMANTIC_GROUPS: dict[str, str] = {
+    "wechat-read": "公众号阅读",
+    "wechat-yuanbao": "公众号检索",
+    "wechat-search": "公众号检索",
+    "douyin-search": "抖音检索",
+    "douyin-author": "抖音主页",
+    "douyin-comments": "抖音评论",
+    "bili-sub": "B站字幕",
+    "zhihu-search": "知乎检索",
+    "zhihu-read": "知乎阅读",
+    "zhihu-comments": "知乎评论",
+    "xhs-search": "小红书检索",
+    "xhs-feed": "小红书发现",
+    "xhs-read": "小红书笔记",
+    "xhs-login": "小红书登录",
+    "twitter-search": "推特检索",
+    "reddit-search": "Reddit检索",
+    "52pojie-http": "吾爱破解",
+    "52pojie-read": "吾爱精读",
+}
+
+
 @contextmanager
-def cdp_background_tab(initial_url: str, task_name: str = "agent-reach-hub"):
-    """Open a background tab via 9223 and guarantee /cleanup on exit."""
+def cdp_background_tab(initial_url: str, task_name: str = "agent-reach-hub", group_name: str = ""):
+    """Open a background tab via 9223 inside a semantic group and guarantee 0-residue /cleanup on exit."""
     tid = None
+    semantic_group = group_name or TASK_SEMANTIC_GROUPS.get(task_name) or "全网检索"
     try:
-        res = cdp_request("/new", {"url": initial_url, "task": task_name, "reuse": True})
+        res = cdp_request("/new", {"url": initial_url, "task": task_name, "group": semantic_group, "reuse": True})
         tid = res.get("targetId")
         yield tid
     finally:
@@ -2349,7 +2372,7 @@ def _get_52pojie_headers_and_cookies() -> tuple[dict[str, str], dict[str, str]]:
 
 
 def _fetch_52pojie_document(url: str) -> tuple[bool, str, str, bool]:
-    """Return (ok, final_url, decoded_text, waf_detected) using direct HTTP + Chrome cookies, with :9223 persistent fallback."""
+    """Return (ok, final_url, decoded_text, waf_detected) using direct HTTP + Chrome cookies, with :9223 ephemeral fallback."""
     headers, cookies = _get_52pojie_headers_and_cookies()
     try:
         with httpx.Client(headers=headers, cookies=cookies, follow_redirects=True, timeout=12.0, trust_env=False) as client:
@@ -2360,7 +2383,7 @@ def _fetch_52pojie_document(url: str) -> tuple[bool, str, str, bool]:
     except Exception:
         pass
 
-    # Fallback: fetch inside :9223 persistent 52pojie.cn tab (preserves session & clearance)
+    # Fallback: fetch inside :9223 ephemeral 52pojie.cn tab (auto-cleaned on exit)
     try:
         with cdp_background_tab("https://www.52pojie.cn/", task_name="52pojie-http") as tid:
             time.sleep(1.5)
@@ -2532,7 +2555,7 @@ def pojie52_search(query: str, limit: int = 10) -> dict[str, Any]:
 
 
 def pojie52_read(tid_or_url: str, reply_limit: int = 15) -> dict[str, Any]:
-    """Read a single 52pojie thread via :9223 persistent reusable tab (logged-in state)."""
+    """Read a single 52pojie thread via :9223 ephemeral tab (logged-in Chrome profile cookies, auto-cleaned)."""
     raw = (tid_or_url or "").strip()
     m = re.search(r"thread-(\d+)-|tid=(\d+)", raw) or re.match(r"^(\d+)$", raw)
     if m:
@@ -2595,7 +2618,7 @@ def pojie52_read(tid_or_url: str, reply_limit: int = 15) -> dict[str, Any]:
         "ok": True,
         "platform": "52pojie",
         "action": "read",
-        "backend": "cdp-9223-persistent",
+        "backend": "cdp-9223",
         "tid": tid_num,
         "url": data.get("url") or target_url,
         "title": data.get("title") or "",

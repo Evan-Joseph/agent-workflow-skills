@@ -78,7 +78,7 @@ linuxdo logout
 
 2. **零焦点抢占授权交互步骤**：
    - 终端或 Agent 执行 `linuxdo login`；
-   - 底层统一经 `POST ${CDP_RELAY_URL}/new` 在 Chrome `AI` 标签组静默打开 LinuxDO 授权确认页（严禁使用未指定浏览器的 `open` 误唤起未登录的 Safari，严禁带 URL 调 `open -g` 触发前台置顶），并联动 `$HOME/.agents/skills/browser-routing/scripts/notify_human_handoff.py` 推送 macOS 横幅；
+   - 底层统一经 `POST ${CDP_RELAY_URL}/new` 在 Chrome 折叠语义标签组（`LinuxDO授权`）静默打开授权确认页（严禁裸调 `open` 误唤起未登录的 Safari，严禁调 `open -g` 绕过分组），并联动 `$HOME/.agents/skills/browser-routing/scripts/notify_human_handoff.py` 推送 macOS 通知；
    - 用户点击通知横幅直达 Chrome 页面点击「授权」按钮（若遇 Cloudflare Turnstile 一并点选通过）；
    - 浏览器自动触发 `linuxdo-mcp-auth.app` 将授权 OTP 写入本地管道；
    - 底层自动完成 OTP 换取独立会话，并在 LinuxDO 账户设置中即时注销一次性 API Key，完成落盘收尾。

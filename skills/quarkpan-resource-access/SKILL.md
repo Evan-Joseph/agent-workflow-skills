@@ -63,38 +63,7 @@ metadata:
 
    ```bash
    # 只读递归统计夸克分享链接的文件总数、总字节数（MiB/GiB）与扩展名分布（零写入、零 Cookie 回显）
-   $HOME/.local/src/quarkpan-skill/.venv/bin/python -c '
-   import collections, json, os, sys
-   from quark_client import QuarkClient
-   url = sys.argv[1]
-   client = QuarkClient()
-   share_id, pwd = client.shares.parse_share_url(url)
-   stoken = client.shares.get_share_token(share_id, pwd)
-   files, dirs, total_bytes, exts = 0, 0, 0, collections.Counter()
-   stack = ["0"]
-   while stack:
-       pdir = stack.pop()
-       page = 1
-       while True:
-           resp = client.api_client.get(
-               "share/sharepage/detail",
-               params={"pwd_id": share_id, "stoken": stoken, "pdir_fid": pdir, "force": "0", "_page": page, "_size": 100, "_fetch_total": "1"},
-               base_url=client.config.SHARE_BASE_URL,
-           )
-           items = (resp.get("data") or {}).get("list") or []
-           for it in items:
-               if it.get("dir") or it.get("file_type") == 0:
-                   dirs += 1
-                   stack.append(str(it["fid"]))
-               else:
-                   files += 1
-                   total_bytes += int(it.get("size") or 0)
-                   exts[os.path.splitext(it.get("file_name") or "")[1].lower() or "<noext>"] += 1
-           if len(items) < 100:
-               break
-           page += 1
-   print(json.dumps({"share_id": share_id, "dirs": dirs, "files": files, "total_bytes": total_bytes, "total_mib": round(total_bytes / 1048576, 2), "total_gib": round(total_bytes / 1073741824, 3), "over_1gib_gate": total_bytes >= 1073741824, "top_exts": dict(exts.most_common(8))}, ensure_ascii=False, indent=2))
-   ' 'https://pan.quark.cn/s/<id>?pwd=<提取码>'
+   python3 $HOME/.agents/skills/quarkpan-resource-access/scripts/preflight_share_tree.py 'https://pan.quark.cn/s/<id>?pwd=<提取码>'
    ```
 3. 分享链接先查看帮助并确认命令支持范围：
 

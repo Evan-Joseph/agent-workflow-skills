@@ -79,6 +79,8 @@ python3 $HOME/.agents/skills/chat-history-export/scripts/vault_cli.py digest-sou
 
 ## 3. QQ / OneBot Read-Only Governance (`scripts/napcat_api.py`)
 
+Favor human-centered contact maintenance over mechanical point-scoring: inspect each person's conversation context, write one concise natural-language memory remark (who they are + shared context/collaboration, searchable by LLMs), and keep simple intuitive groups.
+
 ```bash
 # Read-only audit of unremarked friends and category distribution
 python3 $HOME/.agents/skills/chat-history-export/scripts/napcat_api.py contacts-audit --format markdown
