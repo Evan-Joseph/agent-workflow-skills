@@ -709,7 +709,7 @@ def build_with_pandoc(md_path: Path, out_path: Path, code_mode: bool = False) ->
             tmp_name = tmp.name
         source = Path(tmp_name)
     try:
-        subprocess.run(["pandoc", "-f", "markdown", "-t", "docx", str(source), "-o", str(out_path)], check=True)
+        subprocess.run(["pandoc", "-f", "markdown", "-t", "docx", str(source), "-o", str(out_path)], check=True, stdin=subprocess.DEVNULL, timeout=180)
     finally:
         if tmp_name:
             Path(tmp_name).unlink(missing_ok=True)

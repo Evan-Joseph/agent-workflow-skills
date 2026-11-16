@@ -1,0 +1,7 @@
+interface:
+  display_name: "ARTEX 渗透测试客户端"
+  short_description: "调度与管理本地 ARTEX AI 渗透测试系统任务、资产范围、漏洞发现与对话交互"
+  default_prompt: "Use $artex-client to interact with the local ARTEX AI penetration testing platform (<LOOPBACK_HOST>:8787) for task lifecycle management, scope synchronization, finding inspection, and human-in-the-loop dialogue."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#DC2626"

@@ -63,6 +63,13 @@ def main() -> None:
         default=0,
         help="Zero-based audio track to transcribe (OBS: 0 = game, 1 = mic).",
     )
+    ap.add_argument(
+        "--backend",
+        choices=("auto", "mlx", "whisper-cli", "elevenlabs"),
+        default="auto",
+        help="Transcription backend (default: auto -> local mlx/whisper-cli first, zero cloud upload).",
+    )
+    ap.add_argument("--whisper-model", type=str, default=None, help="Optional local Whisper model override.")
     args = ap.parse_args()
 
     videos_dir = args.videos_dir.resolve()
@@ -85,7 +92,8 @@ def main() -> None:
         print("nothing to do")
         return
 
-    api_key = load_api_key()
+    effective_backend = resolve_backend(args.backend)
+    api_key = load_api_key() if effective_backend == "elevenlabs" else None
 
     print(f"transcribing {len(pending)} files with {args.workers} parallel workers")
     t0 = time.time()
@@ -102,6 +110,8 @@ def main() -> None:
                 num_speakers=args.num_speakers,
                 verbose=False,
                 audio_track=args.audio_track,
+                backend=effective_backend,
+                whisper_model=args.whisper_model,
             ): v
             for v in pending
         }

@@ -14,14 +14,16 @@ if find . -type l -not -path './.git/*' -print | grep -q .; then
   exit 1
 fi
 
-echo "[2/6] Checking forbidden Tier-X & DMCA paths..."
+echo "[2/6] Checking forbidden private ledgers & DMCA paths..."
 for forbidden in \
-  "skills/local-machine-profile" \
-  "skills/artex-client" \
-  "skills/harness-governance" \
   "skills/chat-history-export/vendor/wechat-decrypt" \
   "skills/chat-history-export/vendor" \
-  "skills/ip-materials/vendor/docx-toolkit"; do
+  "skills/ip-materials/vendor/docx-toolkit" \
+  "skills/local-machine-profile/references/user-facts-and-portfolio.md" \
+  "skills/local-machine-profile/references/personal-assets-and-subscriptions.md" \
+  "skills/local-machine-profile/references/environment-facts.md" \
+  "skills/local-machine-profile/references/accounts.md" \
+  "skills/harness-governance/references/inventory.json"; do
   if [ -e "$forbidden" ]; then
     echo "FAIL: FORBIDDEN PATH PRESENT: $forbidden" >&2
     exit 1
@@ -82,8 +84,8 @@ for skill in skills/*; do
   count=$((count + 1))
 done
 
-if [ "$count" -ne 20 ]; then
-  echo "FAIL: Expected exactly 20 skills under skills/, found $count" >&2
+if [ "$count" -ne 23 ]; then
+  echo "FAIL: Expected exactly 23 skills under skills/, found $count" >&2
   exit 1
 fi
 
@@ -92,7 +94,7 @@ import ast, pathlib
 py_files = list(pathlib.Path("skills").rglob("*.py")) + list(pathlib.Path("scripts").rglob("*.py"))
 for p in py_files:
     ast.parse(p.read_text(encoding="utf-8"), filename=str(p))
-print(f"  Verified {len(py_files) - 1} skill Python scripts (+1 compiler) with ast.parse() across 20 skills.")
+print(f"  Verified {len(py_files) - 1} skill Python scripts (+1 compiler) with ast.parse() across 23 skills.")
 PY
 
 echo "[6/6] Checking Markdown relative links across all .md files..."
@@ -124,4 +126,4 @@ if broken:
 print(f"  Verified 0 broken relative links across {len(md_files)} Markdown files.")
 PY
 
-echo "ALL CHECKS PASSED (exit 0) — 20 clean public skills ready."
+echo "ALL CHECKS PASSED (exit 0) — 23 clean public skills ready."

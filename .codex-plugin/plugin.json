@@ -1,7 +1,7 @@
 {
   "name": "agent-workflow-skills",
-  "version": "2.0.0",
-  "description": "20 production-grade cross-harness Agent skills with deterministic Python scripts and quality gates.",
+  "version": "2.1.0",
+  "description": "23 portable SKILL.md agent skills with executable Python scripts and reference guides.",
   "license": "Apache-2.0",
   "repository": "https://github.com/Evan-Joseph/agent-workflow-skills",
   "skillsDir": "skills",
@@ -20,6 +20,11 @@
       "name": "anysearch",
       "path": "skills/anysearch",
       "description": "通过 AnySearch 搜索公开、非敏感的实时信息和跨领域结构化资料。适用于普通网页结果不足，或需要企业、法律、专利、金融、旅行、能源、农业、影视、游戏及跨来源检索时；不用于未发表论文、私有项目、个人数据、凭据或商业秘密。学术论文、GitHub/开发资源和特定平台内容优先使用本机专用 Skills。"
+    },
+    {
+      "name": "artex-client",
+      "path": "skills/artex-client",
+      "description": "Managed zero-leak REST CLI and four-element finding verification gate for authorized local security evaluation services (ARTEX)."
     },
     {
       "name": "awesome-ppt",
@@ -67,6 +72,11 @@
       "description": "用于直接在代码中构建、重塑或高保真审计生产级 Web 与移动端 UI/UX。深度集成 Mobbin（真实商业产品交互流对标）、Awwwards SOTM/SOTY（排版张力与动效 DNA 拆解）、shadcn/ui、transitions.dev、beautifului.dev、beui.dev、rareui.com 与 Impeccable 视觉系统审计。"
     },
     {
+      "name": "harness-governance",
+      "path": "skills/harness-governance",
+      "description": "Cross-harness SKILL.md lifecycle tooling, single-source-of-truth instruction layout (@AGENTS.md), and multi-model role routing conventions across Claude Code, Codex, Gemini CLI, and Antigravity."
+    },
+    {
       "name": "image-generation",
       "path": "skills/image-generation",
       "description": "跨 Harness 的通用图像生成、编辑与本地位图处理中心。原生集成 Grsai API（支持 gpt-image-2, nano-banana 等模型），并包含本地 ImageMagick 格式转换/缩放与系统截图能力。在需要生图、配图、图像尺寸调整或截图取证时使用。"
@@ -80,6 +90,11 @@
       "name": "linuxdo",
       "path": "skills/linuxdo",
       "description": "LinuxDO 社区数据检索、话题深度读取、热榜追踪与会话交互中枢。原生集成独立会话授权机制（Discourse one_time_password OTP）与 Cloudflare 静默过盾策略，支持全量搜索、指定楼层精准阅读、用户信息查询与板块浏览，不干扰日常桌面浏览器使用。"
+    },
+    {
+      "name": "local-machine-profile",
+      "path": "skills/local-machine-profile",
+      "description": "Structured workstation environment & project-boundary SSOT pattern for AI coding agents. Separates static verified baselines, live read-only runtime probes, and domain ledger pointers without storing plaintext secrets."
     },
     {
       "name": "mobile-device-ops",

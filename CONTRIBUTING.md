@@ -35,9 +35,9 @@ Only create directories that the skill actually uses.
 Good:
 
 ```text
-academic-figure-design
-frontend-refresh-workflow
-design-competition-entry
+academic-literature-search
+document-crafting
+browser-routing
 ```
 
 Weak:
@@ -50,11 +50,10 @@ project-tools
 
 ## Before opening a pull request
 
-Run a basic leak check:
+Run the repository validation gate to check frontmatter, Python syntax, relative Markdown links, symlinks, and accidental secret/path leaks:
 
 ```bash
-rg -n "/Users/|password|passwd|token|cookie|api[_-]?key|secret|private_key|BEGIN .*KEY|localhost:[0-9]+|127\\.0\\.0\\.1:[0-9]+" .
-find . -type l -print
+bash scripts/check.sh
 ```
 
 If a match is intentional, explain it in the pull request.

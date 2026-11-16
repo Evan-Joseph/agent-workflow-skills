@@ -215,10 +215,13 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(res, ensure_ascii=False, indent=2))
         return 0 if res.get("ok") else 1
 
-    sync_devtools_endpoint(args.cdp_url, notify_daemon=True, connect=False)
+    if args.cmd not in ("health", "snapshot"):
+        sync_devtools_endpoint(args.cdp_url, notify_daemon=True, connect=False)
 
     if args.cmd == "health":
         code, data = cdp_http_json(args.cdp_url, "/health", method="GET")
+    elif args.cmd == "snapshot":
+        code, data = cdp_http_json(args.cdp_url, "/snapshot", method="GET")
     elif args.cmd == "tabs":
         code, data = cdp_http_json(args.cdp_url, "/tabs", method="GET")
     elif args.cmd == "reconnect":
@@ -286,7 +289,15 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     print(json.dumps(data, ensure_ascii=False, indent=2))
-    return 0 if 200 <= code < 300 else 1
+    if not (200 <= code < 300):
+        return 1
+    if isinstance(data, dict):
+        if data.get("ok") is False or int(data.get("failedCount") or 0) > 0 or "error" in data:
+            return 1
+        res_inner = data.get("result")
+        if isinstance(res_inner, dict) and ("exceptionDetails" in res_inner or "error" in res_inner):
+            return 1
+    return 0
 
 
 if __name__ == "__main__":

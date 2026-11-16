@@ -140,14 +140,28 @@ def resolve_target_tab(
     return None
 
 
+_EVAL_MISSING = object()
+
+
 def eval_on_target(cdp_url: str, target_id: str, expression: str) -> Any:
-    resp = http_json(
-        cdp_url,
-        "/eval",
-        {"targetId": target_id, "expression": expression},
-        timeout=6.0,
-    )
-    return ((resp.get("result") or {}).get("result") or {}).get("value")
+    try:
+        resp = http_json(
+            cdp_url,
+            "/eval",
+            {"targetId": target_id, "expression": expression},
+            timeout=6.0,
+        )
+    except Exception:
+        return _EVAL_MISSING
+    if not isinstance(resp, dict) or resp.get("ok") is False or "error" in resp:
+        return _EVAL_MISSING
+    outer = resp.get("result")
+    if not isinstance(outer, dict) or "exceptionDetails" in outer or "error" in outer:
+        return _EVAL_MISSING
+    inner = outer.get("result")
+    if not isinstance(inner, dict) or "value" not in inner:
+        return _EVAL_MISSING
+    return inner["value"]
 
 
 def set_tab_group_collapsed_via_extension(
@@ -412,8 +426,8 @@ def build_completion_checker(
         if not has_explicit:
             url_changed = _norm_url(current_url) != init_norm
             if initial_auto_challenge:
-                still_challenged = bool(eval_on_target(cdp_url, target_id, AUTO_CHALLENGE_DETECT_JS))
-                return not still_challenged
+                val = eval_on_target(cdp_url, target_id, AUTO_CHALLENGE_DETECT_JS)
+                return val is False
             return url_changed
 
         if args.wait_url_change and _norm_url(current_url) == init_norm:
@@ -500,6 +514,10 @@ def run_handoff(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
     if args.focus_target:
         focus_group = args.group or f"agent-handoff-{args.focus_target[:12]}"
         remove_notification(notifier_bin, focus_group)
+        try:
+            http_json(args.cdp_url, "/handoff", {"targetId": args.focus_target, "leaseMs": 1800_000})
+        except Exception:
+            pass
         res = focus_target_and_open_chrome(args.cdp_url, args.focus_target, args.url or "")
         return 0, {"status": "focused", "removedGroup": focus_group, **res}
 
@@ -566,6 +584,7 @@ def run_handoff(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
 
     old_int = signal.signal(signal.SIGINT, _handle_sig)
     old_term = signal.signal(signal.SIGTERM, _handle_sig)
+    outcome_status = "unknown"
 
     try:
         send_notification(
@@ -581,6 +600,7 @@ def run_handoff(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
         )
 
         if args.no_poll:
+            outcome_status = "notified"
             return 0, {
                 "ok": True,
                 "status": "notified",
@@ -597,6 +617,7 @@ def run_handoff(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
                 break
             live_tab = resolve_target_tab(args.cdp_url, target_id=target_id)
             if not live_tab:
+                outcome_status = "tab_closed"
                 return 0, {
                     "ok": False,
                     "status": "tab_closed",
@@ -608,9 +629,11 @@ def run_handoff(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
             last_url = str(live_tab.get("url") or last_url)
             try:
                 if checker(args.cdp_url, target_id, last_url):
+                    outcome_status = "completed"
                     return 0, {
                         "ok": True,
                         "status": "completed",
+                        "notificationRemoved": True,
                         "group": group_id,
                         "targetId": target_id,
                         "url": last_url,
@@ -621,6 +644,7 @@ def run_handoff(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
                 continue
 
         if interrupted:
+            outcome_status = "interrupted"
             return 130, {
                 "ok": False,
                 "status": "interrupted",
@@ -630,6 +654,7 @@ def run_handoff(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
                 "elapsedSec": round(time.monotonic() - start_ts, 2),
             }
 
+        outcome_status = "timeout"
         action_taken = apply_timeout_policy(
             args.cdp_url,
             args.on_timeout,
@@ -637,12 +662,14 @@ def run_handoff(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
             last_url,
             resolved_task or None,
         )
+        keep_notif = bool(getattr(args, "keep_notification_on_timeout", False))
         rc = 124 if args.exit_nonzero_on_timeout else 0
         return rc, {
             "ok": False,
             "status": "timeout",
             "onTimeout": args.on_timeout,
             "actionTaken": action_taken,
+            "notificationKept": keep_notif,
             "group": group_id,
             "targetId": target_id,
             "url": last_url,
@@ -652,11 +679,28 @@ def run_handoff(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
         signal.signal(signal.SIGINT, old_int)
         signal.signal(signal.SIGTERM, old_term)
         if not args.no_poll:
-            try:
-                http_json(args.cdp_url, "/handoff", {"targetId": target_id, "clear": True})
-            except Exception:
-                pass
-            remove_notification(notifier_bin, group_id)
+            keep_on_timeout = bool(
+                getattr(args, "keep_notification_on_timeout", False)
+                and outcome_status == "timeout"
+            )
+            if keep_on_timeout:
+                if args.on_timeout in ("collapse", "keep"):
+                    try:
+                        retain_ms = int(max(60.0, float(getattr(args, "post_timeout_lease", 14400.0))) * 1000)
+                        http_json(args.cdp_url, "/handoff", {"targetId": target_id, "leaseMs": retain_ms})
+                    except Exception:
+                        pass
+                else:
+                    try:
+                        http_json(args.cdp_url, "/handoff", {"targetId": target_id, "clear": True})
+                    except Exception:
+                        pass
+            else:
+                try:
+                    http_json(args.cdp_url, "/handoff", {"targetId": target_id, "clear": True})
+                except Exception:
+                    pass
+                remove_notification(notifier_bin, group_id)
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -697,6 +741,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
         choices=("collapse", "close", "cleanup-task", "keep"),
         default="collapse",
         help="Tab hygiene action when user is away and notification times out (default: collapse)",
+    )
+    p.add_argument(
+        "--keep-notification-on-timeout",
+        action="store_true",
+        help="Keep macOS notification in Notification Center on timeout (only auto-remove on status=completed) so user can click it upon returning",
+    )
+    p.add_argument(
+        "--post-timeout-lease",
+        type=float,
+        default=14400.0,
+        help="Seconds to retain collapsed/kept tab on :9223 after timeout when --keep-notification-on-timeout is set (default: 14400 = 4h)",
     )
     p.add_argument("--exit-nonzero-on-timeout", action="store_true", help="Exit with code 124 on timeout instead of 0")
     p.add_argument("--no-poll", action="store_true", help="Send notification only and return immediately without polling")

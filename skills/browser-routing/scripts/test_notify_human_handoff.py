@@ -38,6 +38,7 @@ class _MockCDPState:
         self.cdp_calls: list[dict] = []
         self.closed_targets: list[str] = []
         self.cleaned_tasks: list[str] = []
+        self.handoff_calls: list[dict] = []
 
 
 class HumanHandoffTests(unittest.TestCase):
@@ -109,6 +110,9 @@ with open({json.dumps(str(self.log_file))}, "a", encoding="utf-8") as f:
                     tsk = body.get("task")
                     state.cleaned_tasks.append(tsk)
                     state.tabs = [t for t in state.tabs if t.get("task") != tsk]
+                    self._send({"ok": True})
+                elif self.path == "/handoff":
+                    state.handoff_calls.append(body)
                     self._send({"ok": True})
                 else:
                     self._send({"ok": True})
@@ -362,6 +366,75 @@ with open({json.dumps(str(self.log_file))}, "a", encoding="utf-8") as f:
         self.assertEqual(self.state.cleaned_tasks, ["unit-handoff"])
         calls = self._read_notifier_calls()
         self.assertEqual(calls[-1], ["-remove", "agent-handoff-TAB_MOCK_123"])
+
+    def test_keep_notification_on_timeout_preserves_banner_and_extends_lease(self) -> None:
+        args = MOD.build_arg_parser().parse_args(
+            [
+                "--cdp-url",
+                self.cdp_url,
+                "--target-id",
+                "TAB_MOCK_1234567890",
+                "--wait-selector-gone",
+                ".cf-turnstile",
+                "--timeout",
+                "0.4",
+                "--poll-interval",
+                "0.2",
+                "--on-timeout",
+                "collapse",
+                "--keep-notification-on-timeout",
+                "--post-timeout-lease",
+                "7200",
+                "--no-sound",
+                "--notifier-bin",
+                str(self.fake_notifier),
+            ]
+        )
+        rc, res = MOD.run_handoff(args)
+        self.assertEqual(rc, 0)
+        self.assertEqual(res["status"], "timeout")
+        self.assertTrue(res["notificationKept"])
+        calls = self._read_notifier_calls()
+        self.assertEqual(len(calls), 1, "Must NOT call -remove when --keep-notification-on-timeout times out")
+        self.assertNotIn("-remove", calls[0])
+        self.assertGreaterEqual(len(self.state.handoff_calls), 2)
+        self.assertFalse(self.state.handoff_calls[-1].get("clear", False))
+        self.assertEqual(self.state.handoff_calls[-1].get("leaseMs"), 7200_000)
+
+    def test_keep_notification_on_timeout_still_removes_banner_when_completed(self) -> None:
+        def solve_soon() -> None:
+            threading.Event().wait(0.25)
+            self.state.challenge_present = False
+
+        threading.Thread(target=solve_soon, daemon=True).start()
+        args = MOD.build_arg_parser().parse_args(
+            [
+                "--cdp-url",
+                self.cdp_url,
+                "--target-id",
+                "TAB_MOCK_1234567890",
+                "--wait-selector-gone",
+                ".cf-turnstile",
+                "--timeout",
+                "2.5",
+                "--poll-interval",
+                "0.2",
+                "--on-timeout",
+                "collapse",
+                "--keep-notification-on-timeout",
+                "--no-sound",
+                "--notifier-bin",
+                str(self.fake_notifier),
+            ]
+        )
+        rc, res = MOD.run_handoff(args)
+        self.assertEqual(rc, 0)
+        self.assertEqual(res["status"], "completed")
+        self.assertTrue(res["notificationRemoved"])
+        calls = self._read_notifier_calls()
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(calls[1], ["-remove", "agent-handoff-TAB_MOCK_123"])
+        self.assertTrue(self.state.handoff_calls[-1].get("clear"))
 
 
 if __name__ == "__main__":

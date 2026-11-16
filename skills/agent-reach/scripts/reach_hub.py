@@ -167,16 +167,17 @@ TASK_SEMANTIC_GROUPS: dict[str, str] = {
 
 @contextmanager
 def cdp_background_tab(initial_url: str, task_name: str = "agent-reach-hub", group_name: str = ""):
-    """Open a background tab via 9223 inside a semantic group and guarantee 0-residue /cleanup on exit."""
+    """Open an isolated per-invocation background tab via 9223 and guarantee 0-residue /cleanup on exit."""
     tid = None
     semantic_group = group_name or TASK_SEMANTIC_GROUPS.get(task_name) or "全网检索"
+    scoped_task = f"{task_name}-{os.getpid()}-{int(time.time() * 1000) % 1000000}"
     try:
-        res = cdp_request("/new", {"url": initial_url, "task": task_name, "group": semantic_group, "reuse": True})
+        res = cdp_request("/new", {"url": initial_url, "task": scoped_task, "group": semantic_group, "reuse": False})
         tid = res.get("targetId")
         yield tid
     finally:
         try:
-            cdp_request("/cleanup", {"task": task_name}, timeout=8.0)
+            cdp_request("/cleanup", {"task": scoped_task}, timeout=8.0)
         except Exception:
             if tid:
                 try:

@@ -36,22 +36,30 @@ REDACT_CFG = _load_redact_cfg()
 _MAC_USERS_ROOT = "/" + "Users/"
 _COMMISSIONED_TAG = "\u3010\u59d4\u6258\u3011"
 
-# Tier X: Physically excluded private / host-specific skills (NEVER exported)
-TIER_X_BLACKLIST = {
-    "local-machine-profile",
-    "artex-client",
-    "harness-governance",
-}
+# Tier X: Empty when all 23 canonical skills have dedicated Tier-B clean-room templates or Tier-A sanitization
+TIER_X_BLACKLIST: set[str] = set()
 
-# Excluded relative subpaths inside exported skills (DMCA redlines, private ops, heavy caches)
+# Excluded relative subpaths inside exported skills (DMCA redlines, private ledgers, host-only tests)
 EXCLUDED_SUBPATHS = (
     "chat-history-export/vendor",  # HARD DMCA REDLINE: never export third-party wechat-decrypt
     "chat-history-export/scripts/wechat_export.py",
     "chat-history-export/scripts/tg_ops.py",
     "chat-history-export/tests",
     "ip-materials/vendor",  # heavy binary docx-toolkit cache
-    "shuorenhua/evals",  # upstream v2.6.1 slimming practice
+    "shuorenhua/evals",  # private evaluation sample corpus
+    "local-machine-profile/references",  # personal SSOT ledgers (replaced by clean-room protocol doc)
+    "local-machine-profile/scripts",  # host-specific shell probes (replaced by portable Python baseline probe)
+    "harness-governance/references",  # host inventory & relay ledgers (replaced by clean-room routing guide)
+    "harness-governance/tests",
 )
+
+# Explicit allowlist for `harness-governance/scripts/` (prevents leaking host-specific daemons)
+HARNESS_GOVERNANCE_PUBLIC_SCRIPTS = {
+    "init_skill.py",
+    "quick_validate.py",
+    "package_skill.py",
+    "scan_skills.py",
+}
 
 SKIP_DIR_NAMES = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".git", ".venv", "node_modules"}
 SKIP_FILE_NAMES = {".DS_Store"}
@@ -289,6 +297,190 @@ Before attaching dynamic instrumentation (`frida-server`), identify the applicat
 - Provide a `--preflight` check validating NTP clock skew, token freshness, and network reachability before entering time-critical request loops.
 """
 
+PUBLIC_LOCAL_MACHINE_PROFILE_SKILL_MD = """---
+name: local-machine-profile
+description: "Structured workstation environment & project-boundary SSOT pattern for AI coding agents. Separates static verified baselines, live read-only runtime probes, and domain ledger pointers without storing plaintext secrets."
+metadata:
+  short-description: Workstation environment baseline & three-tier SSOT pattern
+---
+
+# Workstation Environment & SSOT Profile (`local-machine-profile`)
+
+Defines a reusable **Single Source of Truth (SSOT)** layout for developer workstations so AI coding agents stop re-probing static OS/toolchain facts on every turn and never hallucinate stale counters after context compaction.
+
+## Three-Tier Profile Architecture
+
+See [`references/three-tier-ssot-protocol.md`](./references/three-tier-ssot-protocol.md) for the full specification:
+
+1. **Tier 1 — Static Verified Baselines**: OS architecture, managed language runtimes, workspace directory conventions, and explicit boundaries between personal open-source projects and client/commissioned work. Every entry records its verification source and date.
+2. **Tier 2 — Live Read-Only Runtime Probes**: Volatile values (active proxy ports, daemon health, container status, remaining API quotas) are never hardcoded as static numbers; query them on demand with read-only commands (`scripts/collect_env_baseline.py`).
+3. **Tier 3 — Domain Ledger Pointers**: High-churn project state stays in each project's own `NOTES.md` or ledger file; the profile stores file pointers rather than duplicating snapshots.
+
+## Secret & Credential Boundary
+
+- Never write plaintext API keys, passwords, cookies, tokens, or payment numbers into `SKILL.md` or `references/*.md`.
+- Store secrets in the OS keychain (`security` on macOS, `secret-tool` on Linux), a local password vault, or `0600` config files outside version control, and document only environment variable names in skill docs.
+
+## Read-Only Workstation Probe
+
+```bash
+python3 $HOME/.agents/skills/local-machine-profile/scripts/collect_env_baseline.py
+```
+"""
+
+PUBLIC_THREE_TIER_SSOT_PROTOCOL_MD = """# Three-Tier Environment & SSOT Governance Protocol
+
+## 1. Tier Separation
+
+| Tier | Scope | Storage Rule |
+| :--- | :--- | :--- |
+| **Tier 1: Static Baseline** | Hardware architecture, OS family, managed Python/Node toolchains, workspace naming conventions, project ownership boundaries | Versioned Markdown verified against primary artifacts; record positive verified facts only |
+| **Tier 2: Dynamic Runtime** | Service health, proxy state, active tasks, rate-limit quotas, database row counts | Never hardcode counts; run deterministic read-only CLI probes when needed |
+| **Tier 3: Domain Ledgers** | Project-specific roadmaps, experiment tables, release checklists | Keep in each workspace's `NOTES.md` and link by path |
+
+## 2. Anti-Compaction Read-Back Order
+
+After context compaction or a cold session resume, verify facts on disk before acting:
+1. Read workspace `AGENTS.md` and `NOTES.md`;
+2. Check Tier-1 baseline files when environment or project-scope rules apply;
+3. Run `scripts/collect_env_baseline.py` if toolchain or proxy state is uncertain.
+
+## 3. Secret Hygiene
+
+Store credentials exclusively in OS keychains or `0600` runtime files (`~/.config/<service>/`). Reference credentials in documentation by environment variable name only (e.g., `$OPENAI_API_KEY`, `$GITHUB_TOKEN`).
+"""
+
+PUBLIC_COLLECT_ENV_BASELINE_PY = '''#!/usr/bin/env python3
+"""Read-only, zero-dependency workstation baseline probe for AI coding agents."""
+from __future__ import annotations
+
+import json
+import os
+import platform
+import shutil
+import sys
+
+TOOLS = ("git", "gh", "python3", "uv", "node", "npm", "pnpm", "cargo", "go", "docker", "ffmpeg")
+
+
+def collect_baseline() -> dict[str, object]:
+    found_tools = {name: shutil.which(name) for name in TOOLS if shutil.which(name)}
+    proxy_vars = {
+        k: bool(os.environ.get(k))
+        for k in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "NO_PROXY")
+        if os.environ.get(k)
+    }
+    return {
+        "os": platform.system(),
+        "release": platform.release(),
+        "machine": platform.machine(),
+        "python": sys.version.split()[0],
+        "proxy_env_present": proxy_vars,
+        "available_tools": found_tools,
+    }
+
+
+if __name__ == "__main__":
+    print(json.dumps(collect_baseline(), ensure_ascii=False, indent=2))
+'''
+
+PUBLIC_ARTEX_CLIENT_SKILL_MD = """---
+name: artex-client
+description: "Managed zero-leak REST CLI and four-element finding verification gate for authorized local security evaluation services (ARTEX)."
+metadata:
+  short-description: Authorized security evaluation CLI & finding verification gate
+---
+
+# Authorized Security Evaluation Client (`artex-client`)
+
+Provides a zero-dependency Python CLI ([`scripts/artex_cli.py`](./scripts/artex_cli.py)) for interacting with a local authorized security evaluation backend (`$ARTEX_BASE_URL`) alongside a strict four-element vulnerability verification gate ([`references/finding-verification-gate.md`](./references/finding-verification-gate.md)).
+
+## Compliance & Authorization Red Lines
+
+1. **Explicit Scope Authorization First**: Never initiate scanning or probing against any target outside an explicitly authorized asset scope.
+2. **Zero Credential Leakage**: `artex_cli.py` reads local state from `$ARTEX_STATE_DIR` (default `~/.local/state/artex`) and caches short-lived JWTs in `0600` files; never pass plaintext passwords or bearer tokens on command lines or print them to `stdout`.
+3. **Mandatory Four-Element Gate Before Reporting**: Every candidate finding must satisfy all four checks in [`references/finding-verification-gate.md`](./references/finding-verification-gate.md):
+   `Trust Boundary -> Affected Principal -> Concrete Reproduction -> Minimal Fix`.
+
+## CLI Usage (`scripts/artex_cli.py`)
+
+```bash
+# 1. Check service health, authentication status, and task/asset counts
+python3 $HOME/.agents/skills/artex-client/scripts/artex_cli.py status
+
+# 2. Preview or sync an authorized target scope
+python3 $HOME/.agents/skills/artex-client/scripts/artex_cli.py scope-sync \\
+  --company "ExampleOrg" --root example.com --endpoint https://api.example.com/v1 --dry-run
+
+# 3. Create or control an evaluation task (pause / resume / cancel)
+python3 $HOME/.agents/skills/artex-client/scripts/artex_cli.py task-create \\
+  --name "Authorized API Audit" --target "example.com" --dry-run
+python3 $HOME/.agents/skills/artex-client/scripts/artex_cli.py task-ctl --list
+
+# 4. Inspect findings and statistics
+python3 $HOME/.agents/skills/artex-client/scripts/artex_cli.py findings --limit 20
+python3 $HOME/.agents/skills/artex-client/scripts/artex_cli.py findings --stats
+```
+"""
+
+PUBLIC_HARNESS_GOVERNANCE_SKILL_MD = """---
+name: harness-governance
+description: "Cross-harness SKILL.md lifecycle tooling, single-source-of-truth instruction layout (@AGENTS.md), and multi-model role routing conventions across Claude Code, Codex, Gemini CLI, and Antigravity."
+metadata:
+  short-description: Cross-harness skill lifecycle validation, packaging & routing
+---
+
+# Multi-Harness Skill Lifecycle & Governance (`harness-governance`)
+
+Standardizes how `SKILL.md` packages and workspace instructions are authored, validated, and shared across multiple AI coding harnesses (**Claude Code**, **OpenAI Codex**, **Google Antigravity**, **Gemini CLI**, and compatible agents) without configuration drift.
+
+## Core Conventions
+
+1. **Canonical Skill Directory (`~/.agents/skills`)**:
+   - Maintain skills in a single canonical directory and project them to `~/.claude/skills` or `~/.codex/skills` via symlinks or plugin manifests rather than maintaining diverging copies.
+   - Keep each `SKILL.md` concise (`< 12 KB`) using progressive disclosure: core routing and guardrails in `SKILL.md`, detailed specifications in `references/`, and deterministic tools in `scripts/`.
+2. **Single Static Root Instruction (`AGENTS.md`)**:
+   - Keep one static `AGENTS.md` per repository root; in harnesses that read `CLAUDE.md`, use a one-line `@AGENTS.md` import so prompt caches remain byte-stable and rules never drift.
+   - Store mutable task progress in `NOTES.md` or `task_plan.md` rather than mutating root instruction files.
+3. **Empirical Role Routing**:
+   - Route architecture/UI design, backend/concurrency auditing, and long-context multimodal synthesis according to [`references/multi-family-model-routing.md`](./references/multi-family-model-routing.md).
+
+## Bundled Skill Lifecycle Scripts
+
+```bash
+# 1. Scaffold a new standard SKILL.md directory
+python3 $HOME/.agents/skills/harness-governance/scripts/init_skill.py my-new-skill --path ./skills
+
+# 2. Validate SKILL.md YAML frontmatter and naming conventions
+python3 $HOME/.agents/skills/harness-governance/scripts/quick_validate.py ./skills/my-new-skill
+
+# 3. Scan an entire skill tree for broken local references and frontmatter health
+python3 $HOME/.agents/skills/harness-governance/scripts/scan_skills.py --root ~/.agents/skills
+
+# 4. Package a validated skill folder into a distributable .skill archive
+python3 $HOME/.agents/skills/harness-governance/scripts/package_skill.py ./skills/my-new-skill ./dist
+```
+"""
+
+PUBLIC_MULTI_FAMILY_ROUTING_MD = """# Empirical Multi-Family Model Routing Guide
+
+When orchestrating multiple frontier model families across coding harnesses, assign roles by empirical strengths and enforce clear scope contracts:
+
+## 1. Role Specialization Matrix
+
+| Primary Task Type | Recommended Model Profile | Scope & Guardrail Contract |
+| :--- | :--- | :--- |
+| **Long-Context Synthesis, Multimodal QA & Natural Technical Writing** | Long-context multimodal coordinator (e.g., Gemini frontier tier; Flash tier for fast read-only codebase scouting) | Verify screenshots/PDFs directly; search proven upstream implementations before writing glue scripts; avoid ad-hoc CSS overrides on existing design systems |
+| **Cross-Module Architecture & Product-Grade Frontend UI/UX** | Architecture & UI specialist (e.g., Claude Opus / Sonnet tier) | Pass explicit `file:line` scope boundaries and design tokens to prevent over-abstraction |
+| **Backend Concurrency, Protocols, Formal Solvers & Diff Review** | Systems & adversarial auditor (e.g., GPT reasoning tier via CLI/reviewer role) | Focus on state machines, file locks, subprocess timeouts, SQL/transaction safety, and edge-case regression review |
+
+## 2. Anti-Context-Rot Practices
+
+- **Zero Trust on Compacted Summaries**: Always re-verify line numbers, git status, and config state on disk after context compaction.
+- **Output Diet (`< 2 KB`)**: Filter large JSON/log outputs inside `jq` or short Python one-liners instead of dumping raw megabytes into the context window.
+- **Anti-Tunnel-Vision Diff Check**: Before patching section `B` of a configuration or specification, inspect `A + B + C` and run `git diff` afterward to ensure `A` and `C` were not accidentally dropped.
+"""
+
 
 def sanitize_cloudflare_skill_md(text: str) -> str:
     """Replace the personal 12-asset ledger in cloudflare/SKILL.md with general production safety gates."""
@@ -509,6 +701,10 @@ RULES: tuple[tuple[str, str, re.Pattern[str]], ...] = tuple(
         f'"http://{_loop_h}:40653"',
         '("http://" + os.environ.get("QCE_HOST", "localhost") + ":" + os.environ.get("QCE_PORT", "40653"))',
     )
+    text = text.replace(
+        f'"http://{_loop_h}:8787"',
+        'os.environ.get("ARTEX_BASE_URL", "http://" + os.environ.get("ARTEX_HOST", "localhost") + ":" + os.environ.get("ARTEX_PORT", "8787"))',
+    )
     uname = REDACT_CFG.get("username", "")
     if uname:
         uhome = f"{_MAC_USERS_ROOT}{uname}"
@@ -717,14 +913,14 @@ def write_plugin_manifests(exported_skills: list[tuple[str, str]]) -> None:
             "url": "https://github.com/Evan-Joseph",
         },
         "metadata": {
-            "description": "20 production-tested cross-harness AI Agent skills with executable Python toolchains, deterministic quality gates, and domain reference trees for Claude Code, Codex, and Antigravity.",
-            "version": "2.0.0",
+            "description": "23 portable SKILL.md agent skills with executable Python scripts and reference guides for Claude Code, Codex, and compatible AI coding agents.",
+            "version": "2.1.0",
             "license": "Apache-2.0",
         },
         "plugins": [
             {
                 "name": "agent-workflow-skills",
-                "description": "Full suite of 20 cross-platform engineering, academic research, document crafting, frontend UI/UX, browser routing, Cloudflare, and media production skills.",
+                "description": "23 portable Agent Skills covering academic literature search, software engineering quality, document/PPT/video workflows, frontend UI, browser automation, and Cloudflare.",
                 "source": "./",
                 "strict": False,
                 "skills": [f"./skills/{slug}" for slug, _ in exported_skills],
@@ -740,8 +936,8 @@ def write_plugin_manifests(exported_skills: list[tuple[str, str]]) -> None:
     codex_dir.mkdir(parents=True, exist_ok=True)
     codex_manifest = {
         "name": "agent-workflow-skills",
-        "version": "2.0.0",
-        "description": "20 production-grade cross-harness Agent skills with deterministic Python scripts and quality gates.",
+        "version": "2.1.0",
+        "description": "23 portable SKILL.md agent skills with executable Python scripts and reference guides.",
         "license": "Apache-2.0",
         "repository": "https://github.com/Evan-Joseph/agent-workflow-skills",
         "skillsDir": "skills",
@@ -802,6 +998,8 @@ def export_all(source_root: Path) -> list[tuple[str, str]]:
                 rel_f = src_f.relative_to(source_root).as_posix()
                 if any(rel_f == ex or rel_f.startswith(ex + "/") for ex in EXCLUDED_SUBPATHS):
                     continue
+                if rel_f.startswith("harness-governance/scripts/") and fname not in HARNESS_GOVERNANCE_PUBLIC_SCRIPTS:
+                    continue
 
                 dst_f = SKILLS_OUT / rel_f
                 dst_f.parent.mkdir(parents=True, exist_ok=True)
@@ -827,6 +1025,15 @@ def export_all(source_root: Path) -> list[tuple[str, str]]:
                     continue
                 if rel_f == "mobile-device-ops/SKILL.md":
                     dst_f.write_text(PUBLIC_MOBILE_DEVICE_OPS_SKILL_MD, encoding="utf-8")
+                    continue
+                if rel_f == "local-machine-profile/SKILL.md":
+                    dst_f.write_text(PUBLIC_LOCAL_MACHINE_PROFILE_SKILL_MD, encoding="utf-8")
+                    continue
+                if rel_f == "artex-client/SKILL.md":
+                    dst_f.write_text(PUBLIC_ARTEX_CLIENT_SKILL_MD, encoding="utf-8")
+                    continue
+                if rel_f == "harness-governance/SKILL.md":
+                    dst_f.write_text(PUBLIC_HARNESS_GOVERNANCE_SKILL_MD, encoding="utf-8")
                     continue
 
                 ext = src_f.suffix.lower()
@@ -859,6 +1066,22 @@ def export_all(source_root: Path) -> list[tuple[str, str]]:
                 if ext in {".py", ".sh"} or (src_f.stat().st_mode & stat.S_IXUSR):
                     dst_f.chmod(0o755)
 
+        # Emit synthesized clean-room companion assets for generalized skills
+        if slug == "local-machine-profile":
+            ref_p = dst_skill / "references" / "three-tier-ssot-protocol.md"
+            ref_p.parent.mkdir(parents=True, exist_ok=True)
+            ref_p.write_text(PUBLIC_THREE_TIER_SSOT_PROTOCOL_MD, encoding="utf-8")
+            probe_p = dst_skill / "scripts" / "collect_env_baseline.py"
+            probe_p.parent.mkdir(parents=True, exist_ok=True)
+            ast.parse(PUBLIC_COLLECT_ENV_BASELINE_PY, filename="local-machine-profile/scripts/collect_env_baseline.py")
+            probe_p.write_text(PUBLIC_COLLECT_ENV_BASELINE_PY, encoding="utf-8")
+            probe_p.chmod(0o755)
+            py_checked += 1
+        elif slug == "harness-governance":
+            ref_p = dst_skill / "references" / "multi-family-model-routing.md"
+            ref_p.parent.mkdir(parents=True, exist_ok=True)
+            ref_p.write_text(PUBLIC_MULTI_FAMILY_ROUTING_MD, encoding="utf-8")
+
         name, desc = extract_frontmatter(dst_skill / "SKILL.md")
         exported.append((name, desc))
 
@@ -870,8 +1093,8 @@ def export_all(source_root: Path) -> list[tuple[str, str]]:
 def main() -> int:
     src = Path(sys.argv[1]).expanduser().resolve() if len(sys.argv) > 1 else DEFAULT_SOURCE
     exported = export_all(src)
-    if len(exported) != 20:
-        print(f"ERROR: expected 20 exported public skills, got {len(exported)}: {[s for s, _ in exported]}", file=sys.stderr)
+    if len(exported) != 23:
+        print(f"ERROR: expected 23 exported public skills, got {len(exported)}: {[s for s, _ in exported]}", file=sys.stderr)
         return 1
     return 0
 

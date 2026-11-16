@@ -1,0 +1,7 @@
+interface:
+  display_name: "本机环境画像"
+  short_description: "查看这台 Mac 的环境、代理、下载路线和操作边界"
+  default_prompt: "Use $local-machine-profile to inspect this Mac environment; for slow or blocked GitHub, PyPI, npm, Homebrew, model, or documentation downloads, verify the managed Clash route on ${PROXY_HOST} before declaring the source unavailable."
+  icon_small: "./assets/skill-icon-glyph.svg"
+  icon_large: "./assets/skill-icon-glyph.svg"
+  brand_color: "#475569"

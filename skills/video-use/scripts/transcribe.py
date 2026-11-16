@@ -75,7 +75,7 @@ def count_audio_tracks(video_path: Path) -> int:
     out = subprocess.run(
         ["ffprobe", "-v", "error", "-select_streams", "a",
          "-show_entries", "stream=index", "-of", "csv=p=0", str(video_path)],
-        capture_output=True, text=True,
+        stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=60,
     )
     return len([ln for ln in out.stdout.splitlines() if ln.strip()])
 
@@ -99,7 +99,7 @@ def extract_audio(video_path: Path, dest: Path, audio_track: int = 0) -> None:
         "-vn", "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le",
         str(dest),
     ]
-    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=600)
 
 
 def call_scribe(

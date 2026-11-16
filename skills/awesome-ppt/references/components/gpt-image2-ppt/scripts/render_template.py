@@ -75,7 +75,7 @@ def _convert_pptx_to_pdf(pptx_path: Path, out_pdf: Path) -> None:
         subprocess.run(
             [cli, "--headless", "--convert-to", "pdf",
              "--outdir", str(out_pdf.parent), str(pptx_path)],
-            check=True, capture_output=True, text=True,
+            check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=300,
         )
         produced = out_pdf.parent / f"{pptx_path.stem}.pdf"
         if not produced.exists():
@@ -85,7 +85,7 @@ def _convert_pptx_to_pdf(pptx_path: Path, out_pdf: Path) -> None:
 
     if shutil.which("docker"):
         inspect = subprocess.run(
-            ["docker", "image", "inspect", DOCKER_IMAGE], capture_output=True
+            ["docker", "image", "inspect", DOCKER_IMAGE], stdin=subprocess.DEVNULL, capture_output=True, timeout=30
         )
         if inspect.returncode != 0:
             raise RuntimeError(
@@ -107,7 +107,7 @@ def _convert_pptx_to_pdf(pptx_path: Path, out_pdf: Path) -> None:
                  DOCKER_IMAGE,
                  "--headless", "--convert-to", "pdf",
                  "--outdir", "/work", f"/work/{pptx_path.name}"],
-                check=True, capture_output=True, text=True,
+                check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=300,
             )
             produced = out_dir / f"{pptx_path.stem}.pdf"
             if not produced.exists():

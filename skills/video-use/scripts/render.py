@@ -63,7 +63,7 @@ SUB_FORCE_STYLE = (
 def run(cmd: list[str], quiet: bool = False) -> None:
     if not quiet:
         print(f"  $ {' '.join(str(c) for c in cmd[:6])}{' …' if len(cmd) > 6 else ''}")
-    subprocess.run(cmd, check=True)
+    subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, timeout=600)
 
 
 def resolve_grade_filter(grade_field: str | None) -> str:

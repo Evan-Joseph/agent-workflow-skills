@@ -48,6 +48,6 @@ metadata:
 ## 四、 图形人机验证通知接力 + 邮箱/短信 OTP 自动接管
 
 当 `:9223` 后台页遇到 Turnstile / GoCaptcha / hCaptcha 等**图形验证**时，**严禁破解绕过，亦不直接退出**：
-- 调用 `python3 $HOME/.agents/skills/browser-routing/scripts/notify_human_handoff.py --task "<task-id>" --title "<简短标题>" --message "点击直达 Chrome 点选图形验证，通过后自动继续" --wait-selector-gone ".cf-turnstile" --timeout 180 --on-timeout collapse`；
-- 用户点击通知时才展开对应标签组并切至 Chrome，超时未处理则自动清通知并收拢回退为 `pending`；
+- 调用 `python3 $HOME/.agents/skills/browser-routing/scripts/notify_human_handoff.py --task "<task-id>" --title "<简短标题>" --message "点击直达 Chrome 点选图形验证，通过后自动继续" --wait-selector-gone ".cf-turnstile" --timeout 180 --on-timeout collapse`（定时签到等后台无人值守场景必加 `--keep-notification-on-timeout`，使轮询超时后保留 macOS 提醒与折叠标签页 4h 租约，仅在验证完成或点击后自动消通知）；
+- 用户点击通知时才展开对应标签组并切至 Chrome，交互式会话未加 `--keep-notification-on-timeout` 时超时自动清通知并收拢回退为 `pending`；
 - **最小打扰原则**：用户 Gmail 与教育邮已全量转发至 `<USER_EMAIL>`，后续 **6 位邮箱或短信验证码必须由 Agent 自动轮询本地 imap-mail IMAP 或 `device-mesh-relay` 短信通道只读提取回填**，严禁让用户手动翻邮箱/手机复制验证码。

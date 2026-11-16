@@ -81,8 +81,10 @@
      - 严禁 AI 廉价蓝紫霓虹配色（`#6630F8` / `#00FFFF` 占比 `>30%` 直接拦截）；
      - 严禁画面静止超过 `1.0s` 的死帧（器乐间奏段必须安排镜头穿行或意象演变）；
      - 严禁顶部/左上角挂常驻章节药丸、页码或底部进度条。
-4. **Stage 4 — 全片确定性帧捕获与高码率压制（Deterministic Frame Capture）**：
-   - 多 Worker 并行开启无头浏览器页面，逐帧调用 `window.seek(f / fps)` 截屏并通过管道喂给 FFmpeg（`libx264 -crf 16 -preset slow -pix_fmt yuv420p`），直接复用原曲音频流生成成片。
+4. **Stage 4 — Apple Silicon 满血并行硬件捕获与压制（[`scripts/web_to_mp4.py`](../scripts/web_to_mp4.py)）**：
+   - **严禁**手写高层 `page.screenshot(path=...)` 逐帧落盘数千张图片或单路纯 CPU 慢速压制！统一调用 `python3 $HOME/.agents/skills/video-use/scripts/web_to_mp4.py`：
+     - **默认 `cdp-metal` 全混合通道**：自动启动高并发 `127.0.0.1` 静态服务（规避 `file://` 限制），单 Chrome 进程开启 `--use-gl=angle --use-angle=metal --enable-gpu-rasterization --enable-zero-copy` 并校验 `WEBGL_debug_renderer_info` 命中 `Apple M1 Pro` Metal（拒绝 SwiftShader 软渲），内部并发 8 个隔离 `BrowserContext` 渲染进程共享单一 Metal GPU，通过原生 CDP `Page.captureScreenshot(format="jpeg", quality=95, optimizeForSpeed=True)` 零稳定性等待抓帧，内存异步队列直灌 8 路并行 `h264_videotoolbox`（`-b:v 22M -maxrate 30M -bufsize 48M -profile:v high -spatial_aq 1 -frames_before/-frames_after -colorspace bt709`）硬件编码子进程，最后 `ffmpeg -f concat -c copy` 秒级无损合流并直通混流 `320k` 母带音轨（内存零堆积、磁盘零散碎帧）；
+     - **可选 `webcodecs` 纯 Canvas 零拷贝通道**：针对单主 `<canvas>`（Canvas 2D / Three.js / `p5.brush`），在 `http://127.0.0.1` `SecureContext` 内直接调浏览器原生 WebCodecs `VideoEncoder`（`avc1.640028` / `avc1.640033`, `hardwareAcceleration: "prefer-hardware"`, `avc: { format: "annexb" }`）直调 VideoToolbox ASIC 输出 H.264 裸流并无损封装 MP4，彻底省去 GPU->CPU 像素回读。
 5. **Stage 5 — 机器同步率审计与受众视角终审（`check.py` & Audience Gate）**：
    - 运行 `check.py` 校验四项硬指标：
      1. **歌词登场窗口**：每句首字视觉显现时间落在人声发音前 `[-0.35s, +0.15s]` 区间内（略早于人声半拍最符合人类视听预期）；
@@ -103,3 +105,5 @@
    - `<Sequence from={Math.round(2.5 * fps)} durationInFrames={Math.round(4.0 * fps)}>` 与 `<Audio trimBefore={...}>` 必须乘以动态 `fps`，严禁硬编码 `30` 或 `60` 帧号，以便在 `30fps` 预览与 `60fps` 母带间无缝切换。
 3. **字体、纹理与 3D 资产的帧阻塞加载（`delayRender` / `continueRender`）**：
    - 本地大字体（如思源宋体、马善政毛笔体）、Three.js 纹理或复杂 SVG 必须通过 `@remotion/google-fonts`、`<Img>` 或 `delayRender()` 阻塞到 100% 就绪后再开始截帧，彻底杜绝首帧字体闪烁（FOUT）或白块。
+4. **Apple Silicon (M1 Pro) 硬件加速渲染 CLI 强制参数**：
+   - 执行 `npx remotion render` 时必须显式指定 `--concurrency=6 --gl=angle --hardware-acceleration=if-possible`（吃满 6P+2E 核心、绑定 ANGLE Metal 后端并启用 VideoToolbox 硬件编解码，禁止回退单核或 SwiftShader）。

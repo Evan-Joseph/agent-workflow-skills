@@ -16,6 +16,7 @@ metadata:
   ```bash
   python3 $HOME/.agents/skills/video-use/scripts/transcribe.py input.mp4 --edit-dir ./edit
   python3 $HOME/.agents/skills/video-use/scripts/timeline_view.py input.mp4 0 15 -o timeline.jpg
+  python3 $HOME/.agents/skills/video-use/scripts/web_to_mp4.py ./web_project -o master.mp4 --audio bgm.mp3
   ```
 - **Agent 防呆红线**：
   - 严禁调用时自作主张创建临时虚拟环境（如 `python -m venv .venv` 或 `conda create`）；
@@ -78,3 +79,17 @@ When tasks involve **code-generated video (HTML Canvas 2D / Three.js WebGL / GLS
    - **声学解构与导演总控（[`Yari-tuber/mv-director`](https://github.com/Yari-tuber/mv-director)）**：`listen.py --demucs` 分离人声与伴奏、提取小节/鼓点/逐字时间戳 `song.json` -> `cues.json` 编写 `says / see / keys` 具象视觉隐喻分镜（遮住字幕仍能看懂歌词） -> `cue_lint.py` 静态检查 -> `check.py` 机器审计（首字显现窗口 `[-0.35s, +0.15s]`、小节重拍命中率 `>=70%`、零 `>1s` 死帧、音画能量相关系数 `>=0.40`）；
    - **专项渲染引擎**：[`lqiaoqing/agent-skills`](https://github.com/lqiaoqing/agent-skills) 下的 `kinetic-lyric-mv`（Three.js/GLSL 3D 高动能排版与 CJK 逐字格点，禁伪斜体）、`painted-mv`（`p5.brush` 12fps 手绘抖动墨线 + 水彩晕染 + 书法双语卡拉 OK）、`paper-story`（Canvas 2D 多层剪纸木偶骨骼视差），以及 `lemo-opuscar`（66 套导演风格卡 + `readcheck.mjs` 中文阅读驻留校验）、`huashu-art-motion`（53 张艺术风格卡 + `long_scroll` 横向一镜到底长卷 + `film_gate.py` 反 PPT / 反蓝紫 AI 塑料感门禁）；
    - **Remotion 官方规范（`remotion-dev/skills` v4.0.541）**：将 `useCurrentFrame()` 下沉至叶子组件隔离重渲染，所有时序参数乘以 `useVideoConfig().fps`，严禁 CSS/Tailwind 动画。
+3. **macOS Apple Silicon 代码视频满血并行硬件渲染硬门禁（`scripts/web_to_mp4.py`）**：
+   - **严禁手写慢速截帧脚本**：严禁调用高层 `page.screenshot()`（默认等待字体/动画帧稳定导致单帧卡顿 ~1s）、严禁逐帧落盘数千张临时 `.png/.jpg` 图片、严禁默认死磕单路纯 CPU `libx264` 闲置 M1 Pro 硬件编码芯片！
+   - **HTML / DOM / CSS / SVG / Three.js / WebGL2 工程统一调用 `web_to_mp4.py`**：
+     ```bash
+     PY=python3
+     RENDERER=$HOME/.agents/skills/video-use/scripts/web_to_mp4.py
+     # 1) 通用全 DOM+CSS+SVG+WebGL 混合快速通道（默认 --mode cdp-metal：单 Chrome Metal GPU + 8 Context 并行 + 原生 CDP optimizeForSpeed 零落盘直灌 8 路 h264_videotoolbox 22Mbps BT.709 + 秒级 concat 混流）
+     $PY $RENDERER ./project_dir -o final_1080p30.mp4 --duration 124 --fps 30 --workers 8 --encoder videotoolbox --audio master_bgm.mp3
+     # 2) 9:16 竖屏成片（1080x1920，自动触发 window.setAspect('9:16') / body[data-aspect]）
+     $PY $RENDERER ./project_dir -o final_vertical.mp4 --aspect 9:16 --audio master_bgm.mp3
+     # 3) 纯单主 Canvas 零拷贝硬件通道（127.0.0.1 SecureContext 原生 WebCodecs VideoEncoder prefer-hardware 直出 Annex-B H.264，免 GPU->CPU 截图回读）
+     $PY $RENDERER ./canvas_dir -o canvas_master.mp4 --mode webcodecs --canvas-selector "#main-canvas" --workers 4 --audio master_bgm.mp3
+     ```
+   - **Remotion 工程 Apple Silicon 强制参数**：调用 `npx remotion render` 时强制携带 `--concurrency=6 --gl=angle --hardware-acceleration=if-possible`（启用 ANGLE Metal 光栅化与 VideoToolbox 硬件加速）。
