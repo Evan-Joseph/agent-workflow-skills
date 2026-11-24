@@ -1,7 +1,7 @@
 {
   "name": "agent-workflow-skills",
-  "version": "2.1.0",
-  "description": "23 portable SKILL.md agent skills with executable Python scripts and reference guides.",
+  "version": "2.2.0",
+  "description": "22 portable SKILL.md agent skills with executable Python scripts and reference guides.",
   "license": "Apache-2.0",
   "repository": "https://github.com/Evan-Joseph/agent-workflow-skills",
   "skillsDir": "skills",
@@ -54,12 +54,12 @@
     {
       "name": "document-crafting",
       "path": "skills/document-crafting",
-      "description": "高保真长文档协作起草、审阅、排版与多格式交付中枢（已融合原 doc-coauthoring 与 report-format-discovery）。覆盖方案/PRD/技术规格/RFC/决策文档协作撰写、报告结构规范发现、Word/Docx 格式规范与 docx-tool (docx_template_tool.py) 零破坏引擎、OnlyOffice 转换、Markdown 转离线排版 HTML 报告、以及基于 LaTeX/Docx 的高质量 PDF 交付。在需要起草或审阅长文档、生成正式公文报告、格式转换或检查排版质量时使用。"
+      "description": "高保真长文档协作起草、审阅、排版与多格式交付中枢（已融合原 doc-coauthoring 与 report-format-discovery）。覆盖方案/PRD/技术规格/RFC/决策文档协作撰写、报告结构规范发现、Word/Docx 格式规范与 docx-tool (docx_template_tool.py) 零破坏引擎、docx2pdf (Microsoft Word 官方引擎) 无头导出、Markdown 转离线排版 HTML 报告、以及基于 LaTeX/Docx 的高质量 PDF 交付。在需要起草或审阅长文档、生成正式公文报告、格式转换或检查排版质量时使用。"
     },
     {
       "name": "document-parsing",
       "path": "skills/document-parsing",
-      "description": "用于从 PDF、扫描件、图片、表格和 Office/HTML 文档中提取结构化内容、OCR、表格、公式、页码来源和 Markdown 素材。印刷体主力路由至 MinerU 高精度解析与 OCR；手写数学/408 答卷严禁调 paddleocr/tesseract，统一经 crop_exam_sheet.py 做 300 DPI 单题裁剪后多模态盲转写；版式重排、表单填写和最终 PDF 渲染路由至 document-crafting。"
+      "description": "用于从 PDF、扫描件、图片、表格、Office/HTML 文档以及飞书/Lark 在线协同文档（docx、Canvas 电子表格与多维表格）中提取结构化内容、OCR、表格、公式、页码来源和 Markdown 素材。印刷体主力路由至 MinerU 高精度解析与 OCR；手写数学/408 答卷严禁调 paddleocr/tesseract，统一经 crop_exam_sheet.py 做 300 DPI 单题裁剪后多模态盲转写；飞书协同文档/Canvas 表格与 Bitable 走 feishu_reader.py；版式重排、表单填写和最终 PDF 渲染路由至 document-crafting。"
     },
     {
       "name": "engineering-quality",
@@ -70,11 +70,6 @@
       "name": "frontend-design",
       "path": "skills/frontend-design",
       "description": "用于直接在代码中构建、重塑或高保真审计生产级 Web 与移动端 UI/UX。深度集成 Mobbin（真实商业产品交互流对标）、Awwwards SOTM/SOTY（排版张力与动效 DNA 拆解）、shadcn/ui、transitions.dev、beautifului.dev、beui.dev、rareui.com 与 Impeccable 视觉系统审计。"
-    },
-    {
-      "name": "harness-governance",
-      "path": "skills/harness-governance",
-      "description": "Cross-harness SKILL.md lifecycle tooling, single-source-of-truth instruction layout (@AGENTS.md), and multi-model role routing conventions across Claude Code, Codex, Gemini CLI, and Antigravity."
     },
     {
       "name": "image-generation",

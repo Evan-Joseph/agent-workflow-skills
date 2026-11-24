@@ -3,7 +3,7 @@ name: cloudflare
 description: "用于 Cloudflare 平台开发、排障和方案审查，包括 Workers、Pages、KV、D1、R2、Durable Objects、Workers AI、Vectorize、Agents SDK、网络、安全和 IaC。"
 license: Complete terms in LICENSE.txt
 metadata:
-  short-description: Cloudflare 平台开发、变更安全门禁与 DO 休眠配额治理
+  short-description: Cloudflare平台开发、生产资产门禁与DO休眠配额治理
 ---
 
 # Cloudflare Platform & Production Asset Governance

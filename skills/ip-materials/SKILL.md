@@ -11,7 +11,7 @@ metadata:
 
 ## 运行时契约与环境约束 (Runtime Contract)
 
-- **统一解释器**：必须固定使用 `python3`（对应 `~/.agents/config/python-runtimes.json` 中的 `miniconda-agent-general` 运行时，包含 `python-docx`、`lxml` 等）。
+- **统一解释器**：必须固定使用 `python3`（本机受管 `miniconda-agent-general` 通用 Python 运行时，包含 `python-docx`、`lxml` 等）。
 - **执行命令范例**：
   ```bash
   python3 $HOME/.agents/skills/ip-materials/scripts/check_environment.py --out-dir 软件著作权申请资料/草稿
@@ -19,8 +19,8 @@ metadata:
 - **Agent 防呆红线**：
   - 严禁调用时自作主张创建临时虚拟环境（如 `python -m venv .venv` 或 `conda create`）；
   - 严禁在 Skill 目录或解释器中随意执行 `pip install`；
-  - 遇到依赖或环境异常，停止执行并统一按 `python-runtimes.json` 规范维护单一真相源，或向用户汇报。
-- **排版与生成环境**：支持原生 OpenXML 校验与 `docx-openxml` 模式，输出文档完全兼容本机 ONLYOFFICE。
+  - 遇到依赖或环境异常，停止执行并核对 `python3` 受管环境状态，或向用户汇报。
+- **排版与生成环境**：支持原生 OpenXML 校验与 `docx-openxml` 模式，输出文档完全兼容本机 Microsoft Word（无头转 PDF 走 `docx2pdf`）。
 
 ## 一、 软件著作权申请资料生成
 

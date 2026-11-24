@@ -7,11 +7,11 @@ metadata:
 
 # LinuxDO 社区检索与交互中枢 (linuxdo)
 
-本 Skill 为全 Harness 体系（Antigravity、Codex、Claude Code、Oh-My-Pi (omp / PI-Desktop)、ARTEX、Devin）提供标准化、高稳定性的 LinuxDO 论坛数据检索与内容读取能力。
+本 Skill 为全 Harness 体系（Antigravity、Codex、Claude Code、Oh-My-Pi (omp / PI-Desktop)、ARTEX）提供标准化、高稳定性的 LinuxDO 论坛数据检索与内容读取能力。
 
 ## 运行时契约与环境约束 (Runtime Contract)
 
-- **统一解释器与工具链**：本技能通过全局 CLI 软链 `linuxdo`（指向 `scripts/linuxdo_cli.py`）运行，底层固定使用 `python3`（对应 `~/.agents/config/python-runtimes.json` 中的 `linuxdo-runtime` 运行时，内置 `linuxdo-mcp` 核心库、`curl_cffi` 与 `pycookiecheat`；注：原无状态包装 `linuxdo` MCP 已收敛下线，统一收口为确定性 CLI）。
+- **统一解释器与工具链**：本技能通过全局 CLI 软链 `linuxdo`（指向 `scripts/linuxdo_cli.py`）运行，底层固定使用 `python3`（受管 `linuxdo-runtime` 运行时，内置 `linuxdo-mcp` 核心库、`curl_cffi` 与 `pycookiecheat`；注：原无状态包装 `linuxdo` MCP 已收敛下线，统一收口为确定性 CLI）。
 - **Agent 防呆红线**：
   - 严禁自作主张创建临时虚拟环境或修改系统 Python；
   - 严禁直接复制或共享桌面浏览器的 `_t` Session Cookie（必须使用 OTP 独立会话 `~/.cache/linuxdo-mcp/session.json`）。
@@ -74,7 +74,7 @@ linuxdo logout
 
 1. **URL Scheme 注册**：
    - 依赖 `~/Applications/linuxdo-mcp-auth.app` 处理 `discourse://auth_redirect` 协议回调。
-   - 若系统丢失关联，运行 `linuxdo-mcp install-handler` 重新注册。
+   - 若系统丢失关联，运行 `$HOME/.local/share/uv/tools/linuxdo-mcp/bin/linuxdo-mcp install-handler` 重新注册。
 
 2. **零焦点抢占授权交互步骤**：
    - 终端或 Agent 执行 `linuxdo login`；

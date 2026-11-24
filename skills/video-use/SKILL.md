@@ -11,7 +11,7 @@ metadata:
 
 ## 运行时契约与环境约束 (Runtime Contract)
 
-- **统一解释器**：必须固定使用 `python3`（对应 `~/.agents/config/python-runtimes.json` 中的 `miniconda-agent-general` 运行时）。
+- **统一解释器**：必须固定使用 `python3`（本机受管 `miniconda-agent-general` 通用 Python 运行时）。
 - **执行命令范例**：
   ```bash
   python3 $HOME/.agents/skills/video-use/scripts/transcribe.py input.mp4 --edit-dir ./edit
@@ -21,8 +21,8 @@ metadata:
 - **Agent 防呆红线**：
   - 严禁调用时自作主张创建临时虚拟环境（如 `python -m venv .venv` 或 `conda create`）；
   - 严禁在 Skill 目录或解释器中随意执行 `pip install`；
-  - 遇到依赖或环境异常，停止执行并统一按 `python-runtimes.json` 规范维护单一真相源，或向用户汇报。
-- **底层媒体工具与凭据**：必须使用系统安装的 `ffmpeg` 与 `ffprobe` CLI；`scripts/transcribe.py` 支持 `--backend {auto,mlx,whisper-cli,elevenlabs}`（`auto` 优先使用零成本本地 Apple Silicon `mlx_whisper` / `whisper-cli` 离线词级转录，云端 ElevenLabs Scribe 自动读取 `~/.config/elevenlabs/elevenlabs.env` 中的 `ELEVENLABS_API_KEY`）。
+  - 遇到依赖或环境异常，停止执行并核对 `python3` 受管环境状态，或向用户汇报。
+- **底层媒体工具与凭据**：必须使用系统安装的 `ffmpeg` 与 `ffprobe` CLI；`scripts/transcribe.py` 支持 `--backend {auto,mlx,whisper-cli,elevenlabs}`（`auto` 优先使用本地离线 Apple Silicon `mlx_whisper` / `whisper-cli` 离线词级转录，云端 ElevenLabs Scribe 自动读取 `~/.config/elevenlabs/elevenlabs.env` 中的 `ELEVENLABS_API_KEY`）。
 
 ## 1. 基础音频/视频处理速查 (FFmpeg CLI)
 
@@ -75,7 +75,7 @@ When tasks involve **code-generated video (HTML Canvas 2D / Three.js WebGL / GLS
 1. **工具路由裁决（确定性代码渲染 vs 云端 SaaS 插件）**：
    - **主线强制走本地确定性代码渲染**：暴露纯函数时间接口 `window.seek(t)` / `window.render(t)` / `useCurrentFrame()`，配合 `mulberry32` 确定性随机种子、闭式阻尼弹簧、自适应子帧快门运动模糊与本地 FFmpeg 高码率压制；
    - **排除云端模板插件混入代码 MV 主线**：Antigravity 插件市场中的 `invideo` (`invideoio/skills` + `https://mcp.invideo.io/mcp`) 与 `canva` 属于云端 SaaS 多轨剪辑/模板工具，不支持自定义 Shader、物理弹簧与帧级确定性代码渲染，且调用生成接口消耗付费 Credits，仅在用户明确需要云端 Stock 素材拼接或人工浏览器时间线粗剪时按需选用。
-2. **四大代码 MV 引擎与上游标杆仓库（本地克隆目录索引见 [`references/code-video-and-mv-ecosystem.md`](./references/code-video-and-mv-ecosystem.md)，本地模型调用统一经唯一网关 MagPie `${OPENAI_COMPAT_BASE_URL}`：脚本与代码规划 `group/opus`、视觉审美 `group/carbon`）**：
+2. **四大代码 MV 引擎与上游标杆仓库（本地克隆目录索引见 [`references/code-video-and-mv-ecosystem.md`](./references/code-video-and-mv-ecosystem.md)；模型协同：默认由原厂 `Antigravity`（`Gemini 4 Carbon`）单栈一镜到底直驱代码动画与多模态视觉审美，脚本批处理按需走零现金 `group/mistral`；仅在用户显式点名时方调用 `claude-magpie -p --model group/fable`）**：
    - **声学解构与导演总控（[`Yari-tuber/mv-director`](https://github.com/Yari-tuber/mv-director)）**：`listen.py --demucs` 分离人声与伴奏、提取小节/鼓点/逐字时间戳 `song.json` -> `cues.json` 编写 `says / see / keys` 具象视觉隐喻分镜（遮住字幕仍能看懂歌词） -> `cue_lint.py` 静态检查 -> `check.py` 机器审计（首字显现窗口 `[-0.35s, +0.15s]`、小节重拍命中率 `>=70%`、零 `>1s` 死帧、音画能量相关系数 `>=0.40`）；
    - **专项渲染引擎**：[`lqiaoqing/agent-skills`](https://github.com/lqiaoqing/agent-skills) 下的 `kinetic-lyric-mv`（Three.js/GLSL 3D 高动能排版与 CJK 逐字格点，禁伪斜体）、`painted-mv`（`p5.brush` 12fps 手绘抖动墨线 + 水彩晕染 + 书法双语卡拉 OK）、`paper-story`（Canvas 2D 多层剪纸木偶骨骼视差），以及 `lemo-opuscar`（66 套导演风格卡 + `readcheck.mjs` 中文阅读驻留校验）、`huashu-art-motion`（53 张艺术风格卡 + `long_scroll` 横向一镜到底长卷 + `film_gate.py` 反 PPT / 反蓝紫 AI 塑料感门禁）；
    - **Remotion 官方规范（`remotion-dev/skills` v4.0.541）**：将 `useCurrentFrame()` 下沉至叶子组件隔离重渲染，所有时序参数乘以 `useVideoConfig().fps`，严禁 CSS/Tailwind 动画。

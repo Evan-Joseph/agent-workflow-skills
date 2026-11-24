@@ -13,9 +13,20 @@ import fcntl
 import json
 import os
 from pathlib import Path
+import socket
 import sys
 import time
 from typing import Any, Iterator
+
+# 当未显式传入代理环境变量且本机 Clash Party :7897 在线时，自动走本地代理防 Cloudflare Anycast 直连重置
+if not any(os.environ.get(k) for k in ("HTTPS_PROXY", "https_proxy", "ALL_PROXY", "all_proxy", "HTTP_PROXY", "http_proxy")):
+    try:
+        with socket.create_connection(("127.0.0.1", 7897), timeout=0.3):
+            os.environ["HTTPS_PROXY"] = os.environ.get("HTTPS_PROXY", "")
+            os.environ["HTTP_PROXY"] = os.environ.get("HTTPS_PROXY", "")
+            os.environ.setdefault("NO_PROXY", "127.0.0.1,localhost,::1")
+    except OSError:
+        pass
 
 try:
     from linuxdo_mcp import auth, client, handler, server, session

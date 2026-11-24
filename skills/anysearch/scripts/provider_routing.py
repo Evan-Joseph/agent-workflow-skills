@@ -2,11 +2,10 @@
 """Multi-source tiered search and fetch router for AnySearch.
 
 Architecture:
-Tier 1: DeepSeek Official Search & Fetch REST API (300ms, dense markdown, authority)
-        Brave Search Official API (global web search, HTTP 200 verified)
+Tier 1: Brave Search Official API (global web search, 2,000 free queries/month, HTTP 200 verified)
 Tier 2: AnySearch Aggregation API
 Tier 3: Bing RSS XML (zero-auth lightweight emergency fallback)
-Note: Bocha AI Search (HTTP 403 quota exhausted as of 2026-11-12) is demoted out of auto chain and only invoked on explicit --provider bocha.
+Note: DeepSeek Official Search (HTTP 402 zero balance as of 2026-11-23), Bocha AI Search (HTTP 403 quota exhausted), and Tavily (HTTP 401 chargeback, never rebind) are excluded from auto chain; deepseek/bocha are only invoked on explicit --provider flags.
 """
 
 from __future__ import annotations
@@ -85,8 +84,30 @@ def get_bocha_key() -> str | None:
     )
 
 
+_DEEPSEEK_402_STAMP = os.path.expanduser("~/.cache/anysearch_deepseek_402.stamp")
+_DEEPSEEK_402_TTL_SEC = 6 * 3600
+
+
+def _deepseek_circuit_open() -> bool:
+    try:
+        return os.path.isfile(_DEEPSEEK_402_STAMP) and (time.time() - os.path.getmtime(_DEEPSEEK_402_STAMP)) < _DEEPSEEK_402_TTL_SEC
+    except OSError:
+        return False
+
+
+def _trip_deepseek_circuit() -> None:
+    try:
+        os.makedirs(os.path.dirname(_DEEPSEEK_402_STAMP), exist_ok=True)
+        with open(_DEEPSEEK_402_STAMP, "w", encoding="utf-8") as f:
+            f.write(str(int(time.time())))
+    except OSError:
+        pass
+
+
 def search_deepseek(query: str, count: int = 10, api_key: str | None = None) -> dict:
     """Query DeepSeek Official Search REST API."""
+    if _deepseek_circuit_open():
+        raise RuntimeError("DEEPSEEK_OFFICIAL_BALANCE_EXHAUSTED_402_CACHED")
     key = api_key or get_deepseek_key()
     if not key:
         raise ValueError("DEEPSEEK_API_KEY is not configured")
@@ -104,6 +125,8 @@ def search_deepseek(query: str, count: int = 10, api_key: str | None = None) -> 
 
     start = time.time()
     resp = requests.post(url, headers=headers, json=payload, timeout=15)
+    if resp.status_code == 402:
+        _trip_deepseek_circuit()
     resp.raise_for_status()
     body = resp.json()
 
@@ -258,6 +281,8 @@ def search_bing_rss(query: str, count: int = 10) -> dict:
 
 def fetch_deepseek(url: str, api_key: str | None = None) -> dict:
     """Fetch and extract markdown content via DeepSeek Official Fetch REST API."""
+    if _deepseek_circuit_open():
+        raise RuntimeError("DEEPSEEK_OFFICIAL_BALANCE_EXHAUSTED_402_CACHED")
     key = api_key or get_deepseek_key()
     if not key:
         raise ValueError("DEEPSEEK_API_KEY is not configured")
@@ -270,6 +295,8 @@ def fetch_deepseek(url: str, api_key: str | None = None) -> dict:
     payload = {"url": url}
 
     resp = requests.post(fetch_url, headers=headers, json=payload, timeout=20)
+    if resp.status_code == 402:
+        _trip_deepseek_circuit()
     resp.raise_for_status()
     body = resp.json()
 
@@ -359,11 +386,10 @@ def tiered_search(
     """Execute tiered multi-source search with automatic failover.
 
     Hierarchy:
-    1. DeepSeek Official Search (if key configured in env / Keychain / credentials.json)
-    2. Brave Search Official API (if key configured in env / Keychain)
-    3. AnySearch API (if fallback_fn provided)
-    4. Bing RSS XML
-    (Bocha is demoted out of auto chain due to 403 quota exhaustion; callable explicitly via preferred_provider='bocha'.)
+    1. Brave Search Official API (if key configured in env / Keychain)
+    2. AnySearch API (if fallback_fn provided)
+    3. Bing RSS XML
+    (DeepSeek 402 zero-balance, Bocha 403 quota-exhausted, and Tavily 401 are excluded from auto chain; callable explicitly via preferred_provider='deepseek'|'bocha'.)
     """
     prov = preferred_provider.lower().strip()
     errors = []
@@ -384,7 +410,7 @@ def tiered_search(
             return search_bocha(query, count), "bocha"
         except Exception as e:
             errors.append(f"Bocha(explicit): {e}")
-    elif prov in ("bing", "bing_rss"):
+    elif prov in ("bing", "bing_rss", "bing-rss"):
         try:
             return search_bing_rss(query, count), "bing_rss"
         except Exception as e:
@@ -395,17 +421,8 @@ def tiered_search(
         except Exception as e:
             errors.append(f"AnySearch(explicit): {e}")
 
-    # Auto tiered routing
-    # Tier 1a: DeepSeek Official Search
-    if get_deepseek_key():
-        try:
-            res = search_deepseek(query, count)
-            if (res.get("data") or {}).get("results"):
-                return res, "deepseek"
-        except Exception as e:
-            errors.append(f"DeepSeek: {e}")
-
-    # Tier 1b: Brave Search Official API
+    # Auto tiered routing (DeepSeek 402 / Bocha 403 / Tavily 401 excluded)
+    # Tier 1: Brave Search Official API
     if get_brave_key():
         try:
             res = search_brave(query, count)

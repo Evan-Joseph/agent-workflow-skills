@@ -1,6 +1,6 @@
 # $impeccable hooks
 
-> **本机治理边界（Local Harness Note）**：本机四端（Antigravity / Claude Code / Codex / Oh-My-Pi）全局默认仅挂载唯一零副作用守卫 [`$HOME/.agents/scripts/pre_command_guard.py`](file://$HOME/.agents/scripts/pre_command_guard.py)；Impeccable 设计检测优先通过手动只读扫描 `node $HOME/.agents/skills-archive/impeccable/scripts/detect.mjs` 执行，项目级编辑后自动 Hook 仅在用户针对特定前端仓库显式授权时开启。
+> **本机治理边界（Local Harness Note）**：本机五端（Antigravity / Claude Code / Codex / Oh-My-Pi / PI-Desktop）默认使用各自官方原厂权限与沙盒机制，不挂载自定义全局拦截 Hook；若需启用 Impeccable 设计检测脚本，仅在用户针对特定前端仓库显式授权时按需运行（历史归档脚本存于 `~/Desktop/【归档】历史项目/20261119_治理中台/root/skills-archive/impeccable/scripts/`）。
 
 Manage the **design detector hook** for the current project.
 

@@ -65,12 +65,12 @@ Every revision package must include a standalone `Response to Reviewers` (`respo
 
 ---
 
-## 5. Local Offline Simulated Double-Blind Peer Review (`:3425` MagPie)
+## 5. Local Offline Simulated Peer Review (`cospan` / `:3425` Zero-Cash First)
 
 Before locking an initial submission or revision package:
 
 - **Privacy & Email Redline**: Never upload unpublished manuscripts, review letters, or rebuttal drafts to third-party web review sites, and **never enter advisor (`<ADVISOR_EMAIL>`) or collaborator emails** into external forms.
-- **Local Deterministic Dual-Reviewer Protocol**: Run offline simulated review exclusively through local MagPie (`${OPENAI_COMPAT_BASE_URL}`, project-bound `Bearer magpie-<slug>` key + `X-Magpie-Session`, bypassing proxy on `127.0.0.1`):
-  - **`group/sol` (Methodology, Math & Baseline Skeptic)**: Audits formal definitions, equation indices/dimensions, ablation isolation, baseline fairness, statistical significance, and claim-evidence overreach;
-  - **`group/opus` (AE / Narrative & Rebuttal Critique)**: Audits contribution clarity, related-work positioning, *Neurocomputing* / Elsevier scope fit, figure-caption self-containment, and whether `Response to Reviewers` persuasively resolves every reviewer concern without over-conceding.
+- **Tier-1 Zero-Cash Dual-Track Simulated Review (Default)**:
+  - **`cospan --to agy` (`Gemini 4 Carbon` AE / Methodology & Rebuttal Critique + `Gemini 4 Neon` Experiment / Code Checks)** paired with zero-cash local MagPie (`${OPENAI_COMPAT_BASE_URL}`, `group/mistral` / `group/moark-pro`, bypassing proxy on `127.0.0.1`) audits formal definitions, equation indices/dimensions, ablation isolation, statistical significance, scope fit, figure-caption self-containment, and whether `Response to Reviewers` resolves every concern without over-conceding.
+- **Optional User-Approved Final Sprint Reserve**: Only when preparing a critical submission/revision sprint and approved by the user, invoke targeted blind review via `codex exec` (`group/sol` / `group/astra`) or `claude-magpie -p` (`group/opus`).
 - Log all valid findings into `review_risk_register.md` and resolve blocking items before human final signoff.

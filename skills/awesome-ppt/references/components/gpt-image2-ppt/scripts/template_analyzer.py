@@ -197,7 +197,7 @@ def compute_source_hash(pptx_path: Optional[str], images: List[str]) -> str:
 
 
 # =============================================================================
-# VisionClient (默认走本地唯一网关 MagPie ${OPENAI_COMPAT_BASE_URL} group/carbon)
+# VisionClient (默认走本地唯一网关 MagPie ${OPENAI_COMPAT_BASE_URL} 零现金 group/mistral)
 # =============================================================================
 
 MAGPIE_PROBE_CONFIG = Path("~/.agents/config/openai-probe.json").expanduser()
@@ -221,7 +221,7 @@ def _is_loopback_endpoint(url: str) -> bool:
 
 
 class VisionClient:
-    """OpenAI 兼容多模态 chat completions 客户端，默认连接本机 MagPie :3425 group/carbon。"""
+    """OpenAI 兼容多模态 chat completions 客户端，默认连接本机 MagPie :3425 group/mistral（优先原生会话直读）。"""
 
     def __init__(self) -> None:
         probe = _load_magpie_probe_config()
@@ -237,7 +237,7 @@ class VisionClient:
             or probe.get("api_key")
             or ""
         ).strip()
-        self.model = os.getenv("VISION_MODEL_NAME") or "group/carbon"
+        self.model = os.getenv("VISION_MODEL_NAME") or "group/mistral"
         self.user_agent = probe.get("user_agent") or "magpie-awesome-ppt/1.0"
         self.session_id = os.getenv("MAGPIE_SESSION_ID") or "awesome-ppt-template-vision"
         if not self.base_url:

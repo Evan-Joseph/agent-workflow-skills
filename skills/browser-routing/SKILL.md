@@ -13,15 +13,17 @@ metadata:
 
 - **`:9223` 持久守护控制与人机接力**（`homebrew-stdlib` -> `python3`）：
   - 统一入口：`cdp-ctl`（[`scripts/cdp_ctl.py`](./scripts/cdp_ctl.py)，自动同步 `0600` `DevToolsActivePort` 规避 `com.apple.macl` 弹窗）；
-  - 图形验证通知接力：[`scripts/notify_human_handoff.py`](./scripts/notify_human_handoff.py)（默认 `AgentHandoffNotifier.app` `Alerts` 常驻样式，点击精准展开对应 Chrome 标签页）。
-- **匿名反爬沙盒**（`camoufox` -> `python3`）：[`scripts/camoufox_profile.py`](./scripts/camoufox_profile.py)。
+  - **图形验证通知接力**：[`scripts/notify_human_handoff.py`](./scripts/notify_human_handoff.py)（默认 `AgentHandoffNotifier.app` `Alerts` 常驻样式，点击精准展开对应 Chrome 标签页）。
+- **首选 Chromium 隔离反检测沙盒**（`patchright` -> `python3`）：复用系统 Chrome（`channel="chrome"`）+ `tempfile` 独立临时 `user_data_dir` + `headless=True` + `:7897` 代理，零焦点抢占、零 `webdriver` 泄漏、零字体/沙盒白屏；健康检查 `~/.agents/runtimes/patchright/healthcheck.py`。
+- **Firefox 反爬沙盒（备选/存量 Profile）**（`camoufox` -> `python3`）：[`scripts/camoufox_profile.py`](./scripts/camoufox_profile.py)。注意 `vw_edge_relay.py` 强依赖该 Python 环境，**严禁删除、升级或改动 `camoufox/.venv`**。
 - **防呆红线**：严禁自建临时 `venv` 或随意 `pip install`。
 
 ## 一、 四通道选型路由
 
 | 场景需求 | 唯一通道 | 关键边界 |
 | :--- | :--- | :--- |
-| **需要日常 Chrome 已登录态**（社媒、教务、控制台） | `${CDP_RELAY_URL}`（首选 `cdp-ctl`） | **严禁直连 `:9222`**（触发远程调试弹窗）；**严禁裸调 `open` 或 `open -g -a "Google Chrome"`**（产生脱离分组的孤儿页且易误开 Safari） |
+| **需要日常 Chrome 已登录态**（社媒、教务、控制台） | `${CDP_RELAY_URL}`（首选 `cdp-ctl`） | **严禁直连 `:9222`**（触发远程调试弹窗）；**严禁裸调 `open` 或 `open -g -a "Google Chrome"`**（产生脱离分组的孤儿页且易误开 Safari）；遇飞书/Lark 等 Canvas 表格或多维表格 `cdp-ctl text` (`innerText`) 返回空文本时，严禁盲判无法读取，转调 `$HOME/.agents/skills/document-parsing/scripts/feishu_reader.py` 提取页面内存模型并自动清理 `:9223` 标签 |
+| **匿名隔离反检测抓取 / 无污染临时会话** | **首选 `patchright`**（`~/.agents/runtimes/patchright/.venv/bin/python` + `channel="chrome"` + 临时 `user_data_dir`）；存量 Profile 备选 `camoufox` | 必须使用 `tempfile.TemporaryDirectory()` 独立临时目录，严禁挂载日常 Chrome 默认 User Data Dir 抢占 `SingletonLock`；自动化默认 `headless=True`，严禁弹出前台窗口抢占焦点 |
 | **Localhost 前端验收 / 破坏性交互回归** | 无头 Playwright / `@playwright/mcp` | 隔离沙盒运行，禁止挂载日常 Chrome 默认 User Data Dir 抢占 `SingletonLock` |
 | **免登录公开页极速语义快照** | `agent-browser` CLI（`open` -> `snapshot -i` -> `close`） | 精简语义树节省上下文，用毕立即 `close` |
 | **LCP / Heap / CSS / A11y 深度性能诊断** | `chrome-devtools` MCP（`~/.local/bin/chrome-cdp-mcp`）或 `:9223` | 默认 `--headless --isolated`；详细诊断流程见 [`references/web-vitals-a11y-cookie-memory-debugging.md`](./references/web-vitals-a11y-cookie-memory-debugging.md) |
@@ -51,3 +53,28 @@ metadata:
 - 调用 `python3 $HOME/.agents/skills/browser-routing/scripts/notify_human_handoff.py --task "<task-id>" --title "<简短标题>" --message "点击直达 Chrome 点选图形验证，通过后自动继续" --wait-selector-gone ".cf-turnstile" --timeout 180 --on-timeout collapse`（定时签到等后台无人值守场景必加 `--keep-notification-on-timeout`，使轮询超时后保留 macOS 提醒与折叠标签页 4h 租约，仅在验证完成或点击后自动消通知）；
 - 用户点击通知时才展开对应标签组并切至 Chrome，交互式会话未加 `--keep-notification-on-timeout` 时超时自动清通知并收拢回退为 `pending`；
 - **最小打扰原则**：用户 Gmail 与教育邮已全量转发至 `<USER_EMAIL>`，后续 **6 位邮箱或短信验证码必须由 Agent 自动轮询本地 imap-mail IMAP 或 `device-mesh-relay` 短信通道只读提取回填**，严禁让用户手动翻邮箱/手机复制验证码。
+
+## 五、 匿名隔离反检测沙盒调用范式（Patchright 首选 / Camoufox 防踩坑）
+
+1. **首选：`patchright` + 系统 Chrome 隔离沙盒**（免下百兆包、无焦点抢占、`navigator.webdriver == false`）：
+   ```python
+   import tempfile
+   from patchright.sync_api import sync_playwright
+
+   with tempfile.TemporaryDirectory(prefix="patchright-") as user_data_dir:
+       with sync_playwright() as pw:
+           ctx = pw.chromium.launch_persistent_context(
+               user_data_dir,
+               channel="chrome",
+               headless=True,
+               no_viewport=True,
+               proxy={"server": "${HTTPS_PROXY}"},
+           )
+           page = ctx.pages[0] if ctx.pages else ctx.new_page()
+           page.goto("https://example.com", wait_until="domcontentloaded", timeout=30_000)
+           ctx.close()
+   ```
+2. **备选：`camoufox` macOS `27.2.1` 防踩坑参数**（仅用于存量 Firefox Profile 或特定 Gecko 指纹场景）：
+   - **代理继承防断连**：启用 `geoip=True` 时必须在进程环境变量导出 `HTTP_PROXY=${HTTPS_PROXY} HTTPS_PROXY=${HTTPS_PROXY}`（或经 `with_clash.sh`），避免 30 天 mmdb 过期时 `download_mmdb()` 裸连报 `ConnectionResetError(54)`；
+   - **显式声明 OS 与系统字体防方块乱码**：必传 `os="macos"` 与 `fonts=[".SF NS", "PingFang SC", "Helvetica Neue"]`，禁止留空触发随机 Win/Linux 字体子集导致 macOS 标签栏/界面豆腐块；
+   - **默认无头防白屏与零抢焦点**：自动化一律 `headless=True`；仅在确需有头排障遇内容区白屏时追加 `firefox_user_prefs={"security.sandbox.content.level": 1, "gfx.webrender.software": True}`。

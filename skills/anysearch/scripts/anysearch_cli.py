@@ -353,7 +353,7 @@ def cmd_search(args):
             print(_format_search_response(envelope), end="")
         return
 
-    # Otherwise, execute tiered multi-source search (DeepSeek/Brave -> AnySearch -> Bing RSS) with up to 20 results
+    # Otherwise, execute tiered multi-source search (Brave -> AnySearch -> Bing RSS) with up to 20 results
     try:
         from provider_routing import tiered_search
         count = requested_max
@@ -396,24 +396,13 @@ def cmd_get_sub_domains(args):
 
 
 def cmd_extract(args):
-    """Fetch and extract full page content from a URL with anti-bot shell detection + r.jina.ai fallback."""
+    """Fetch and extract full page content via r.jina.ai first with AnySearch /v1/extract fallback and anti-bot shell detection."""
     url = args.url or getattr(args, "url_opt", None)
     if not url:
         print("Error: url is required", file=sys.stderr)
         sys.exit(1)
 
-    # 1. Try DeepSeek Fetch REST API first if configured
-    try:
-        from provider_routing import get_deepseek_key, fetch_deepseek
-        if get_deepseek_key():
-            envelope = fetch_deepseek(url)
-            if not _is_challenge_or_empty(envelope):
-                print(_format_extract_response(envelope))
-                return
-    except Exception:
-        pass
-
-    # 2. Try r.jina.ai Markdown reader fallback (handles JS-rendered docs cleanly)
+    # 1. Try r.jina.ai Markdown reader first (handles JS-rendered docs cleanly)
     try:
         jina_env = _fetch_jina_reader(url)
         if jina_env and not _is_challenge_or_empty(jina_env):
@@ -422,7 +411,7 @@ def cmd_extract(args):
     except Exception:
         pass
 
-    # 3. Fallback to AnySearch /v1/extract
+    # 2. Fallback to AnySearch /v1/extract
     envelope = _call_or_exit("POST", "/v1/extract", args.api_key, payload={"url": url})
     if _is_challenge_or_empty(envelope):
         print(
@@ -690,9 +679,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     search_p.add_argument(
         "--provider",
-        choices=["auto", "deepseek", "bocha", "anysearch", "bing"],
+        choices=["auto", "brave", "anysearch", "bing", "bing-rss", "deepseek", "bocha"],
         default="auto",
-        help="Search provider: auto (Tier 1 DeepSeek/Bocha -> AnySearch -> Bing), or force specific provider.",
+        help="Search provider: auto (Tier 1 Brave -> Tier 2 AnySearch -> Tier 3 Bing RSS), or force specific provider (deepseek/bocha disabled in auto due to 402/403).",
     )
     search_p.add_argument(
         "--json",

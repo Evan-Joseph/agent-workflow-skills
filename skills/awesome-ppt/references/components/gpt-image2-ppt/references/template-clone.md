@@ -15,13 +15,13 @@ python3 scripts/generate_ppt.py \
 
 ## Template Rendering
 
-`scripts/render_template.py` 会把 `.pptx` 自动渲染成每页 PNG，存到 `<cwd>/template_renders/<stem>/page-NN.png`。
+`scripts/render_template.py` 会把 `.pptx` 或已导出的 `.pdf` 自动渲染成每页 PNG，存到 `<cwd>/template_renders/<stem>/page-NN.png`。
 
 后端优先级：
 
-1. 本机 `libreoffice` / `soffice` 命令。
-2. 本机 Docker + `linuxserver/libreoffice` 镜像。
-3. PDF -> PNG 走 `pymupdf`，没有就用 `pdf2image` + poppler。
+1. 若已有导出的 PDF（如从 Microsoft PowerPoint / Keynote 导出），直接传入 `.pdf` 给 `render_template.py`，由 `pymupdf`（首选）或 `pdf2image` + `poppler` 栅格化为 `page-NN.png`。
+2. macOS 本机已安装 Microsoft PowerPoint 时，可由 `render_template.py` 经 PowerPoint AppleScript 无损导出 PDF 再栅格化（严禁安装或调用已卸载的 LibreOffice / `soffice`）。
+3. 若无法自动导出，手动从 Microsoft PowerPoint / Keynote 导出每页 PNG，命名为 `page-01.png` 起按字典序对应页码。
 
 手动预渲染：
 
@@ -29,13 +29,11 @@ python3 scripts/generate_ppt.py \
 python3 scripts/render_template.py company-template.pptx
 ```
 
-如果 LibreOffice 和 Docker 都不可用，让用户从 PowerPoint/Keynote/WPS 导出每页 PNG，命名为 `page-01.png` 起按字典序对应页码。
-
 ## Cache Layers
 
 | 资料 | 路径 | 用途 |
 | --- | --- | --- |
-| 模板每页 PNG | `<cwd>/template_renders/<stem>/page-NN.png` | LibreOffice 一次渲染长期复用 |
+| 模板每页 PNG | `<cwd>/template_renders/<stem>/page-NN.png` | PowerPoint / PDF 一次渲染长期复用 |
 | Vision 风格分析 | `<cwd>/template_cache/<sha256>.json` | 多模态分析一次长期复用 |
 | 生成产物 | `<cwd>/outputs/<timestamp>/` | 每次新跑都新目录 |
 

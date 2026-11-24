@@ -11,7 +11,7 @@ metadata:
 
 ## 运行时契约与环境约束 (Runtime Contract)
 
-- **统一解释器**：必须固定使用 `python3`（对应 `~/.agents/config/python-runtimes.json` 中的 `miniconda-agent-general` 运行时）。
+- **统一解释器**：必须固定使用 `python3`（本机受管 `miniconda-agent-general` 通用 Python 运行时）。
 - **执行命令范例**：
   ```bash
   python3 $HOME/.agents/skills/image-generation/scripts/grsai_generate.py config
@@ -23,7 +23,7 @@ metadata:
 - **Agent 防呆红线**：
   - 严禁调用时自作主张创建临时虚拟环境（如 `python -m venv .venv` 或 `conda create`）；
   - 严禁在 Skill 目录或解释器中随意执行 `pip install`；
-  - 遇到依赖或环境异常，停止执行并统一按 `python-runtimes.json` 规范维护单一真相源，或向用户汇报。
+  - 遇到依赖或环境异常，停止执行并核对 `python3` 受管环境状态，或向用户汇报。
 - **Grsai 凭据与本地依赖**：自动读取 `~/.config/grsai/grsai.env`（`GRSAI_API_KEY` 与 `GRSAI_BASE_URL`，统一登记于 `~/.config/ai-relays/credentials.json` 的 `tool_apis.grsai` 指针台账），严禁在代码或输出中打印 Key；本地位图依赖 ImageMagick CLI (`magick`) 与 macOS 系统截图 (`screencapture`)。
 
 ## 1. AI 生图（Grsai 专职主力通道）

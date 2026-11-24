@@ -75,7 +75,7 @@ GRSAI_API_KEY=sk-...
 模板克隆时，vision 分析和图片生成各自按本机真源路由：
 
 - 如果当前 Agent 自己具备多模态看图能力，可直接读取模板页 PNG 并写入 `template_cache/<sha256>.json`。
-- 当脚本自动执行模板视觉剖析（`scripts/template_analyzer.py`）时，默认直连本机唯一模型网关 **MagPie `${OPENAI_COMPAT_BASE_URL}`**（确定性组 `VISION_MODEL_NAME=group/carbon`），自动只读加载 `~/.agents/config/magpie-ops-probe.json` 或 `VISION_API_KEY` / `MAGPIE_API_KEY` 环境变量（本地回环请求强制旁路代理，严禁硬编码旧密钥）。
+- 当脚本自动执行模板视觉剖析（`scripts/template_analyzer.py`）时，优先由原生多模态会话（`Gemini 4 Carbon / Neon`）直接看图分析；无头批处理默认直连本机唯一模型网关 **MagPie `${OPENAI_COMPAT_BASE_URL}`**（零现金组 `VISION_MODEL_NAME=group/mistral`），自动只读加载 `~/.agents/config/magpie-ops-probe.json` 或 `VISION_API_KEY` / `MAGPIE_API_KEY` 环境变量（本地回环请求强制旁路代理，严禁硬编码旧密钥）。
 - Grsai 生图通道（`scripts/image_generator.py`）直接委托复用 `$HOME/.agents/skills/image-generation/scripts/grsai_generate.py` 的核心实现与 `~/.config/grsai/grsai.env`。
 
 ## Codex CLI Backend

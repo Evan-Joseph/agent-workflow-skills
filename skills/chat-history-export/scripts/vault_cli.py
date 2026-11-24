@@ -23,6 +23,14 @@ import urllib.error
 import urllib.request
 from xml.etree import ElementTree as ET
 
+_WECHAT_VENV_PY = "python3"
+if os.path.isfile(_WECHAT_VENV_PY) and os.path.realpath(sys.executable) != os.path.realpath(_WECHAT_VENV_PY):
+    try:
+        import zstandard as _zstd_probe  # noqa: F401
+        from Crypto.Cipher import AES as _aes_probe  # noqa: F401
+    except Exception:
+        os.execv(_WECHAT_VENV_PY, [_WECHAT_VENV_PY, *sys.argv])
+
 from wechat_schema import message_columns as shared_message_columns
 from wechat_schema import message_table as shared_message_table
 
@@ -263,7 +271,7 @@ def maybe_sync_if_stale(args: argparse.Namespace, decrypted_dir: Path) -> dict:
         file=sys.stderr,
     )
     res = subprocess.run(
-        [sys.executable, str(decrypt_script), "-i"],
+        [_WECHAT_VENV_PY if os.path.isfile(_WECHAT_VENV_PY) else sys.executable, str(decrypt_script), "-i"],
         cwd=str(tool_dir),
         stdin=subprocess.DEVNULL,
         stdout=sys.stderr,
@@ -2120,7 +2128,7 @@ def rerank_notes_via_magpie(
 def enrich_notes_via_magpie(
     items: list[dict],
     *,
-    model: str = "group/flash",
+    model: str = "group/deepseek",
     timeout_sec: int = 120,
 ) -> tuple[list[dict], str]:
     """Optional semantic structuring via local MagPie :3425 (zero proxy detour, graceful degradation)."""
@@ -2581,7 +2589,7 @@ def command_notes(args: argparse.Namespace) -> None:
     if getattr(args, "llm", False):
         items, llm_status = enrich_notes_via_magpie(
             items,
-            model=getattr(args, "llm_model", "group/flash"),
+            model=getattr(args, "llm_model", "group/deepseek"),
         )
     payload = {
         "vault_synced_at": staleness["vault_synced_at"],
@@ -2868,8 +2876,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--include-untagged", action="store_true", default=True, help="兼容旧参数：默认已开启高信号无标签笔记提取")
     p.add_argument("--save-aliases", action="store_true", help="将消息中声明的新标签简称（如 #resource（简称#res））持久化至 state/note_tag_aliases.json")
     p.add_argument("--semantic-query", default="", help="通过本地 MagPie :3425/v1/rerank (moark/Qwen3-Reranker-4B) 按语义相关性排序候选笔记")
-    p.add_argument("--llm", action="store_true", help="通过本地 MagPie :3425 (默认 group/flash) 执行语义分类与标题提炼")
-    p.add_argument("--llm-model", default="group/flash", help="指定本地 MagPie 确定性模型组（默认 group/flash，超时 >=115s）")
+    p.add_argument("--llm", action="store_true", help="通过本地 MagPie :3425 (默认 group/moark-pro) 执行语义分类与标题提炼")
+    p.add_argument("--llm-model", default="group/moark-pro", help="指定本地 MagPie 确定性模型组（默认 group/moark-pro，超时 >=115s）")
     p.add_argument("--format", choices=["json", "text"], default="json")
     _add_sync_if_stale_arg(p)
     p.set_defaults(func=command_notes)

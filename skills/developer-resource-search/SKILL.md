@@ -21,7 +21,7 @@ developer platforms instead of general web search.
 
 ## 运行时契约与环境约束 (Runtime Contract)
 
-- **统一解释器**：必须固定使用 `python3`（对应 `~/.agents/config/python-runtimes.json` 中的 `research-search` 锁定运行时）。
+- **统一解释器**：必须固定使用 `python3`（本机受管 `research-search` 锁定运行时）。
 - **执行命令范例与自检**：
   ```bash
   python3 -c "import httpx, socksio; print('research-search ok')"

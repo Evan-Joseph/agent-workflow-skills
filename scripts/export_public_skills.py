@@ -4,7 +4,7 @@
 Reads the private canonical skill tree (~/.agents/skills) in strictly read-only mode,
 excludes Tier X private skills and DMCA/heavy vendor directories, performs deep Tier B
 generalization and Tier A parameterization, expands relative symlinks into portable
-wrappers, validates every exported Python script with `ast.parse`, and emits the 20
+wrappers, validates every exported Python script with `ast.parse`, and emits the 22
 zero-leak public skills into `./skills/` alongside Claude Code & Codex plugin manifests.
 """
 from __future__ import annotations
@@ -36,7 +36,7 @@ REDACT_CFG = _load_redact_cfg()
 _MAC_USERS_ROOT = "/" + "Users/"
 _COMMISSIONED_TAG = "\u3010\u59d4\u6258\u3011"
 
-# Tier X: Empty when all 23 canonical skills have dedicated Tier-B clean-room templates or Tier-A sanitization
+# Tier X: Empty when all 22 canonical skills have dedicated Tier-B clean-room templates or Tier-A sanitization
 TIER_X_BLACKLIST: set[str] = set()
 
 # Excluded relative subpaths inside exported skills (DMCA redlines, private ledgers, host-only tests)
@@ -49,17 +49,7 @@ EXCLUDED_SUBPATHS = (
     "shuorenhua/evals",  # private evaluation sample corpus
     "local-machine-profile/references",  # personal SSOT ledgers (replaced by clean-room protocol doc)
     "local-machine-profile/scripts",  # host-specific shell probes (replaced by portable Python baseline probe)
-    "harness-governance/references",  # host inventory & relay ledgers (replaced by clean-room routing guide)
-    "harness-governance/tests",
 )
-
-# Explicit allowlist for `harness-governance/scripts/` (prevents leaking host-specific daemons)
-HARNESS_GOVERNANCE_PUBLIC_SCRIPTS = {
-    "init_skill.py",
-    "quick_validate.py",
-    "package_skill.py",
-    "scan_skills.py",
-}
 
 SKIP_DIR_NAMES = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".git", ".venv", "node_modules"}
 SKIP_FILE_NAMES = {".DS_Store"}
@@ -423,69 +413,10 @@ python3 $HOME/.agents/skills/artex-client/scripts/artex_cli.py findings --stats
 ```
 """
 
-PUBLIC_HARNESS_GOVERNANCE_SKILL_MD = """---
-name: harness-governance
-description: "Cross-harness SKILL.md lifecycle tooling, single-source-of-truth instruction layout (@AGENTS.md), and multi-model role routing conventions across Claude Code, Codex, Gemini CLI, and Antigravity."
-metadata:
-  short-description: Cross-harness skill lifecycle validation, packaging & routing
----
-
-# Multi-Harness Skill Lifecycle & Governance (`harness-governance`)
-
-Standardizes how `SKILL.md` packages and workspace instructions are authored, validated, and shared across multiple AI coding harnesses (**Claude Code**, **OpenAI Codex**, **Google Antigravity**, **Gemini CLI**, and compatible agents) without configuration drift.
-
-## Core Conventions
-
-1. **Canonical Skill Directory (`~/.agents/skills`)**:
-   - Maintain skills in a single canonical directory and project them to `~/.claude/skills` or `~/.codex/skills` via symlinks or plugin manifests rather than maintaining diverging copies.
-   - Keep each `SKILL.md` concise (`< 12 KB`) using progressive disclosure: core routing and guardrails in `SKILL.md`, detailed specifications in `references/`, and deterministic tools in `scripts/`.
-2. **Single Static Root Instruction (`AGENTS.md`)**:
-   - Keep one static `AGENTS.md` per repository root; in harnesses that read `CLAUDE.md`, use a one-line `@AGENTS.md` import so prompt caches remain byte-stable and rules never drift.
-   - Store mutable task progress in `NOTES.md` or `task_plan.md` rather than mutating root instruction files.
-3. **Empirical Role Routing**:
-   - Route architecture/UI design, backend/concurrency auditing, and long-context multimodal synthesis according to [`references/multi-family-model-routing.md`](./references/multi-family-model-routing.md).
-
-## Bundled Skill Lifecycle Scripts
-
-```bash
-# 1. Scaffold a new standard SKILL.md directory
-python3 $HOME/.agents/skills/harness-governance/scripts/init_skill.py my-new-skill --path ./skills
-
-# 2. Validate SKILL.md YAML frontmatter and naming conventions
-python3 $HOME/.agents/skills/harness-governance/scripts/quick_validate.py ./skills/my-new-skill
-
-# 3. Scan an entire skill tree for broken local references and frontmatter health
-python3 $HOME/.agents/skills/harness-governance/scripts/scan_skills.py --root ~/.agents/skills
-
-# 4. Package a validated skill folder into a distributable .skill archive
-python3 $HOME/.agents/skills/harness-governance/scripts/package_skill.py ./skills/my-new-skill ./dist
-```
-"""
-
-PUBLIC_MULTI_FAMILY_ROUTING_MD = """# Empirical Multi-Family Model Routing Guide
-
-When orchestrating multiple frontier model families across coding harnesses, assign roles by empirical strengths and enforce clear scope contracts:
-
-## 1. Role Specialization Matrix
-
-| Primary Task Type | Recommended Model Profile | Scope & Guardrail Contract |
-| :--- | :--- | :--- |
-| **Long-Context Synthesis, Multimodal QA & Natural Technical Writing** | Long-context multimodal coordinator (e.g., Gemini frontier tier; Flash tier for fast read-only codebase scouting) | Verify screenshots/PDFs directly; search proven upstream implementations before writing glue scripts; avoid ad-hoc CSS overrides on existing design systems |
-| **Cross-Module Architecture & Product-Grade Frontend UI/UX** | Architecture & UI specialist (e.g., Claude Opus / Sonnet tier) | Pass explicit `file:line` scope boundaries and design tokens to prevent over-abstraction |
-| **Backend Concurrency, Protocols, Formal Solvers & Diff Review** | Systems & adversarial auditor (e.g., GPT reasoning tier via CLI/reviewer role) | Focus on state machines, file locks, subprocess timeouts, SQL/transaction safety, and edge-case regression review |
-
-## 2. Anti-Context-Rot Practices
-
-- **Zero Trust on Compacted Summaries**: Always re-verify line numbers, git status, and config state on disk after context compaction.
-- **Output Diet (`< 2 KB`)**: Filter large JSON/log outputs inside `jq` or short Python one-liners instead of dumping raw megabytes into the context window.
-- **Anti-Tunnel-Vision Diff Check**: Before patching section `B` of a configuration or specification, inspect `A + B + C` and run `git diff` afterward to ensure `A` and `C` were not accidentally dropped.
-"""
-
-
 def sanitize_cloudflare_skill_md(text: str) -> str:
-    """Replace the personal 12-asset ledger in cloudflare/SKILL.md with general production safety gates."""
+    """Replace the personal asset ledger in cloudflare/SKILL.md with general production safety gates."""
     pattern = re.compile(
-        r"## (?:一、 )?本机(?: Cloudflare| 12 项生产)?资产[^\n]*\n.*?(?=\n(?:## Retrieval Sources|### 一键只读健康度))",
+        r"## (?:一、 )?(?:本机(?: Cloudflare| 12 项生产)?资产|生产资产保护清单)[^\n]*\n.*?(?=\n(?:## Retrieval Sources|### 一键只读健康度))",
         re.S,
     )
     replacement = """## 一、 生产变更安全门禁与 DO 休眠配额治理
@@ -540,6 +471,20 @@ def sanitize_shuorenhua_docs(text: str, rel_path: str) -> str:
             "评测原始语料（`evals/`）涉及本地真实业务样本，不随公开仓库分发。",
         )
     return text
+
+
+def sanitize_chat_security_md(text: str) -> str:
+    """Replace host-specific legal-hold dates/paths in chat-history-export security docs with generic guidance."""
+    pattern = re.compile(
+        r"> \*\*\[法务封存最高门禁[^\n]*\n(?:>[^\n]*\n)+",
+        re.S,
+    )
+    replacement = (
+        "> **[证据保留与只读合规门禁]**\n"
+        "> 在需要原状留存历史通讯记录或冻结在线会话期间：严禁发起在线 MTProto 自动化连接或写入操作；"
+        "严禁删除或篡改任何本地聊天数据库与已归档审计报告；严禁接入任何 OSINT / 社工库服务。\n"
+    )
+    return pattern.sub(replacement, text, count=1)
 
 
 def sanitize_python_code(text: str, rel_path: str) -> str:
@@ -788,6 +733,8 @@ def sanitize_common_text(text: str) -> str:
         text = re.sub(rf"{re.escape(uhome)}/Desktop/[^\s)\"`'>]+", "$WORKSPACE_DIR", text)
         text = re.sub(rf"{re.escape(uhome)}/Documents/[^\s)\"`'>]+", "$DOCUMENTS_DIR", text)
     text = re.sub(rf"{re.escape(_MAC_USERS_ROOT)}[A-Za-z0-9_.-]+/", "$HOME/", text)
+    # Unwrap Markdown links targeting host-local ~/... paths into plain label text (prevents 404 relative links on GitHub)
+    text = re.sub(r"\[([^\]]+)\]\((~/[^\s)]+)\)", r"\1", text)
 
     # 3. Personal & third-party PII / emails / handles / domains loaded from host redaction config
     for raw_email, placeholder in REDACT_CFG.get("emails", {}).items():
@@ -913,14 +860,14 @@ def write_plugin_manifests(exported_skills: list[tuple[str, str]]) -> None:
             "url": "https://github.com/Evan-Joseph",
         },
         "metadata": {
-            "description": "23 portable SKILL.md agent skills with executable Python scripts and reference guides for Claude Code, Codex, and compatible AI coding agents.",
-            "version": "2.1.0",
+            "description": "22 portable SKILL.md agent skills with executable Python scripts and reference guides for Claude Code, Codex, and compatible AI coding agents.",
+            "version": "2.2.0",
             "license": "Apache-2.0",
         },
         "plugins": [
             {
                 "name": "agent-workflow-skills",
-                "description": "23 portable Agent Skills covering academic literature search, software engineering quality, document/PPT/video workflows, frontend UI, browser automation, and Cloudflare.",
+                "description": "22 portable Agent Skills covering academic literature search, software engineering quality, document/PPT/video workflows, frontend UI, browser automation, and Cloudflare.",
                 "source": "./",
                 "strict": False,
                 "skills": [f"./skills/{slug}" for slug, _ in exported_skills],
@@ -936,8 +883,8 @@ def write_plugin_manifests(exported_skills: list[tuple[str, str]]) -> None:
     codex_dir.mkdir(parents=True, exist_ok=True)
     codex_manifest = {
         "name": "agent-workflow-skills",
-        "version": "2.1.0",
-        "description": "23 portable SKILL.md agent skills with executable Python scripts and reference guides.",
+        "version": "2.2.0",
+        "description": "22 portable SKILL.md agent skills with executable Python scripts and reference guides.",
         "license": "Apache-2.0",
         "repository": "https://github.com/Evan-Joseph/agent-workflow-skills",
         "skillsDir": "skills",
@@ -998,8 +945,6 @@ def export_all(source_root: Path) -> list[tuple[str, str]]:
                 rel_f = src_f.relative_to(source_root).as_posix()
                 if any(rel_f == ex or rel_f.startswith(ex + "/") for ex in EXCLUDED_SUBPATHS):
                     continue
-                if rel_f.startswith("harness-governance/scripts/") and fname not in HARNESS_GOVERNANCE_PUBLIC_SCRIPTS:
-                    continue
 
                 dst_f = SKILLS_OUT / rel_f
                 dst_f.parent.mkdir(parents=True, exist_ok=True)
@@ -1032,9 +977,6 @@ def export_all(source_root: Path) -> list[tuple[str, str]]:
                 if rel_f == "artex-client/SKILL.md":
                     dst_f.write_text(PUBLIC_ARTEX_CLIENT_SKILL_MD, encoding="utf-8")
                     continue
-                if rel_f == "harness-governance/SKILL.md":
-                    dst_f.write_text(PUBLIC_HARNESS_GOVERNANCE_SKILL_MD, encoding="utf-8")
-                    continue
 
                 ext = src_f.suffix.lower()
                 is_text = ext in TEXT_EXTENSIONS or fname in {"LICENSE", "SKILL.md", ".env.example"} or fname.startswith("LICENSE.")
@@ -1052,6 +994,8 @@ def export_all(source_root: Path) -> list[tuple[str, str]]:
                     raw = sanitize_cloudflare_skill_md(raw)
                 elif rel_f == "browser-routing/SKILL.md":
                     raw = sanitize_browser_routing_skill_md(raw)
+                elif rel_f == "chat-history-export/references/security-and-risk-boundaries.md":
+                    raw = sanitize_chat_security_md(raw)
                 elif rel_f in {"shuorenhua/SKILL.md", "shuorenhua/README.md"}:
                     raw = sanitize_shuorenhua_docs(raw, rel_f)
 
@@ -1077,10 +1021,6 @@ def export_all(source_root: Path) -> list[tuple[str, str]]:
             probe_p.write_text(PUBLIC_COLLECT_ENV_BASELINE_PY, encoding="utf-8")
             probe_p.chmod(0o755)
             py_checked += 1
-        elif slug == "harness-governance":
-            ref_p = dst_skill / "references" / "multi-family-model-routing.md"
-            ref_p.parent.mkdir(parents=True, exist_ok=True)
-            ref_p.write_text(PUBLIC_MULTI_FAMILY_ROUTING_MD, encoding="utf-8")
 
         name, desc = extract_frontmatter(dst_skill / "SKILL.md")
         exported.append((name, desc))
@@ -1093,8 +1033,8 @@ def export_all(source_root: Path) -> list[tuple[str, str]]:
 def main() -> int:
     src = Path(sys.argv[1]).expanduser().resolve() if len(sys.argv) > 1 else DEFAULT_SOURCE
     exported = export_all(src)
-    if len(exported) != 23:
-        print(f"ERROR: expected 23 exported public skills, got {len(exported)}: {[s for s, _ in exported]}", file=sys.stderr)
+    if len(exported) != 22:
+        print(f"ERROR: expected 22 exported public skills, got {len(exported)}: {[s for s, _ in exported]}", file=sys.stderr)
         return 1
     return 0
 

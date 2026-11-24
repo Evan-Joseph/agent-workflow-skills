@@ -11,10 +11,10 @@ metadata:
 
 ## Runtime Contract
 
-- 本机脚本固定使用 `python3`；依赖合同由 `~/.agents/config/python-runtimes.json` 审计。
+- 本机脚本固定使用 `python3`（本机受管 `miniconda-agent-general` 通用 Python 运行时）。
 - 缺少解释器或核心模块时停止并报告具体缺项，不向系统 Python 安装包，也不为单次任务创建临时 venv。
 - 模板分析结果带有 status 字段：ok 表示 pptx 元数据和图片分析均可用；degraded 或 incomplete 表示只完成部分分析。template-strict 下不得接受后两种状态。
-- 模板视觉分析（`scripts/template_analyzer.py`）默认走本机唯一模型网关 MagPie `${OPENAI_COMPAT_BASE_URL}`（`group/carbon`，自动读取 `~/.agents/config/magpie-ops-probe.json` 或 `VISION_*` 环境变量）；Grsai 图像生成（`scripts/image_generator.py`）直接委托复用 `$HOME/.agents/skills/image-generation/scripts/grsai_generate.py`。
+- 模板视觉分析（`scripts/template_analyzer.py`）优先由当前原生多模态会话（`Gemini 4 Carbon / Neon`）直接看图拆解，无头批处理默认走本机唯一网关 MagPie `${OPENAI_COMPAT_BASE_URL}` 零现金 `group/mistral`（自动读取 `~/.agents/config/magpie-ops-probe.json` 或 `VISION_*` 环境变量）；Grsai 图像生成（`scripts/image_generator.py`）直接委托复用 `$HOME/.agents/skills/image-generation/scripts/grsai_generate.py`。
 
 ## Boundary
 
@@ -24,7 +24,7 @@ metadata:
 - 需要复用本 Skill 的 `slides_plan.md`/`slides_plan.json`、内置 styles、模板克隆缓存或批量生成脚本。
 - 已有 `awesome-ppt` 规划结果，需要用这里的后端脚本执行生成或复跑局部页面。
 
-不要把本 Skill 当成所有 PPT 请求的默认 owner。若用户要求 fully editable、母版、原生文本框、复杂图表或正式模板精修，优先转 `presentations`、Office 工作流或 `awesome-ppt` 的 editable 路线。
+不要把本 Skill 当成所有 PPT 请求的默认 owner。若用户要求 fully editable、母版、原生文本框、复杂图表或正式模板精修，优先转 `document-crafting`、Microsoft PowerPoint 工作流或 `awesome-ppt` 的 editable 路线。
 
 默认凭据不放在 Skill 目录。脚本优先读取私有文件
 `~/.config/gpt-image2-ppt/gpt-image2-ppt.env`，并可回退到
@@ -39,7 +39,7 @@ metadata:
 - 用本 Skill 的脚本渲染整页 PPT。
 - 复用已有 `.pptx` 模板的视觉风格。
 
-不要用于需要全量可编辑文本框、母版、动画和复杂原生图表的精修 PPT；这种场景优先用 `presentations` 或 `office-docx`/Office 工作流。
+不要用于需要全量可编辑文本框、母版、动画和复杂原生图表的精修 PPT；这种场景优先用 `document-crafting` 或 Microsoft PowerPoint 工作流。
 
 ## First Questions
 

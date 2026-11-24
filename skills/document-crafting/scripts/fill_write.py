@@ -37,7 +37,7 @@ def ensure_deps():
                 {
                     "status": "error",
                     "error": "Missing dependency: pypdf",
-                    "hint": "Repair the managed runtime declared in ~/.agents/config/python-runtimes.json",
+                    "hint": "Ensure pypdf is installed in the managed runtime python3",
                 }
             ),
             file=sys.stderr,

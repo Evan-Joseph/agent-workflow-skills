@@ -1,6 +1,6 @@
 # 代码驱动视频、Remotion 与艺术歌词 MV 生态架构与工程规范
 
-> **定位**：本文档沉淀 Antigravity 官方插件市场、Remotion 官方及社区技能矩阵、以及代码驱动艺术歌词 MV / 零配音视觉短片（UNRAVEL STUDIO 主线）的完整技术选型、确定性时钟契约、分镜隐喻门禁与自动化质检标准。
+> **定位**：本文档沉淀 Antigravity 官方插件市场、Remotion 官方及社区技能矩阵、以及代码驱动艺术歌词 MV / 零配音视觉短片（《不在画下》/ 抖音号 `Dairyeah` 主线）的完整技术选型、确定性时钟契约、分镜隐喻门禁与自动化质检标准。
 > - **本地上游参考仓库仓（已克隆）**：[`$WORKSPACE_DIR`]($WORKSPACE_PATH)（本地保留 `lemo-opuscar`、`huashu-art-motion`、`awesome-opus5-5-videos`；`mv-director` 与 `lqiaoqing/agent-skills` 直连上游 GitHub 仓库参考）
 > - **全局索引对照**：[`$WORKSPACE_DIR`]($WORKSPACE_PATH)
 
@@ -15,8 +15,8 @@
 | **底层渲染机制** | 暴露确定性时间函数 `window.seek(t)` / `window.render(t)` / `useCurrentFrame()`，由无头 Chromium 逐帧光栅化 + 本地 FFmpeg 高码率压制 | 调用远程 MCP (`https://mcp.invideo.io/mcp`) 或 CLI 操作云端多轨剪辑器、Stock 素材库、SaaS 模板与云端生成式 AI 接口 |
 | **核心代表生态** | 1. [`remotion-dev/skills`](https://github.com/remotion-dev/skills) (`v4.0.541`, 6.5k Stars)<br>2. [`lemomo-ai/lemo-opuscar`](https://github.com/lemomo-ai/lemo-opuscar) (13.1k Stars, 66 套导演风格)<br>3. [`alchaincyf/huashu-art-motion`](https://github.com/alchaincyf/huashu-art-motion) (6.4k Stars, 53 张艺术风格卡)<br>4. [`Yari-tuber/mv-director`](https://github.com/Yari-tuber/mv-director) + [`lqiaoqing/agent-skills`](https://github.com/lqiaoqing/agent-skills) (`kinetic-lyric-mv` / `painted-mv` / `paper-story`)<br>5. [`heygen-com/hyperframes`](https://github.com/heygen-com/hyperframes) (77.1k Stars) | 1. `antigravity-plugins-partners/plugin/invideo`（含 `/invideo`, `/invideo-timeline`, `/invideo-media`, `/invideo-generate`, `/hyperframes-to-invideo` 等 7 个子技能）<br>2. `antigravity-plugins-partners/plugin/canva`（Canva Connect MCP 静态/轻量版式设计） |
 | **音画同步与视觉上限** | **帧级确定性（`<1.5f` 误差）**：支持 HPSS 鼓点/能量包络直接驱动 GLSL Raymarching 着色器、Three.js 粒子场、水墨/水彩动态笔触（`p5.brush`）、闭合阻尼弹簧与 $4\times$ 子帧快门运动模糊 | 仅支持轨道级剪辑（`roll`/`slip_clip`）、LUT 滤镜、预设转场与关键帧；**无法直接运行自定义 Shader、物理弹簧或代码粒子**（连其自带的 `hyperframes-to-invideo` 都要求先在本地将代码渲染为 MP4 再上传至云端当普通视频轨道切） |
-| **算力与资金成本** | **100% 本地零边际成本**：本地音频分析 + 唯一本地网关 MagPie（`${OPENAI_COMPAT_BASE_URL}`，脚本规划与代码生成走 `group/opus`、多模态视觉审美走 `group/carbon`）+ 本地无头 Chrome / FFmpeg 渲染 | 时间线剪辑免费，但 `/invideo-generate`（调用 `seedance_2_5`、`nanobanana_pro`、`elevenlabs` 等）持续消耗 InVideo 付费订阅 Credits |
-| **路由裁决结论** | **强制用于**：艺术歌词 MV（如 EP03《精卫》）、零配音深度视觉论文（如 EP01《信息茧房》、EP02《超级个体》）、算法/数学可视化、Apple Keynote 级产品宣传片 | **不纳入代码 MV 主线**；仅当用户明确要求“使用云端 Stock 实拍素材/数字人拼装商业口播广告，且需要在浏览器 GUI 时间线手动拖拽精修”时按需选用 `invideo` |
+| **算力与资金成本** | **零现金原生直驱**：本地音频分析与本地无头 Chrome / FFmpeg 渲染，默认由原厂 **`Antigravity`（`Gemini 4 Carbon`）** 单栈一镜到底直驱 62 个开源视觉库底座与多模态审美终审，脚本批处理按需走零现金 `group/mistral`；仅在用户显式点名时方点射 `claude-magpie -p --model group/fable` | 时间线剪辑免费，但 `/invideo-generate`（调用 `seedance_2_5`、`nanobanana_pro`、`elevenlabs` 等）持续消耗 InVideo 付费订阅 Credits |
+| **路由裁决结论** | **强制用于**：名诗/文学/演讲/经典哲学隐喻与 62 个开源视觉库 2D/2.5D 故事化动态视觉、零配音深度视觉短片（《不在画下》主线，如 EP01《信息茧房》、EP02《超级个体》；原《精卫》MV 已作为历史杂糅实验淘汰归档）、艺术歌词 MV、算法/数学可视化、Apple Keynote 级产品宣传片 | **不纳入代码 MV 主线**；仅当用户明确要求“使用云端 Stock 实拍素材/数字人拼装商业口播广告，且需要在浏览器 GUI 时间线手动拖拽精修”时按需选用 `invideo` |
 
 ---
 
@@ -51,15 +51,15 @@
 
 ## 3. 代码驱动艺术歌词 MV 四大引擎与五步工业流水线
 
-针对《精卫》及后续音乐 MV / 艺术短片创作，本机已集成 `mv-director`、`kinetic-lyric-mv`、`painted-mv`、`paper-story`、`lemo-opuscar` 与 `huashu-art-motion` 完整方法论：
+面向《不在画下》（`Dairyeah`）故事化视觉短片及音乐 MV 创作（原《精卫》实验已淘汰归档，方法论沉淀为通用模块），本机已集成 `mv-director`、`kinetic-lyric-mv`、`painted-mv`、`paper-story`、`lemo-opuscar` 与 `huashu-art-motion` 完整方法论：
 
 ### 3.1 四大专项 MV 渲染引擎选型表
 
 | 引擎名称 | 上游仓库 | 核心技术栈 | 最佳适用曲风与视觉母题 |
 | :--- | :--- | :--- | :--- |
 | **`mv-director`**（导演总控与歌词卡点管线） | [`Yari-tuber/mv-director`](https://github.com/Yari-tuber/mv-director) | `listen.py` (`librosa` + `demucs` + 词级强制对齐) -> `cues.json` (`says`/`see`/`keys`) -> `cue_lint.py` -> `check.py` | **所有歌词 MV 的前置声学解构、逐句分镜设计与同步率机器验收总控** |
-| **`kinetic-lyric-mv`**（3D/GLSL 高动能排版 MV） | [`lqiaoqing/agent-skills` (`skills/kinetic-lyric-mv`)](https://github.com/lqiaoqing/agent-skills/tree/main/skills/kinetic-lyric-mv) | Three.js WebGL2 + GLSL Raymarching / 版画排线着色器 + Bloom + CJK 逐字格点引擎 (`NotoSansSC`, `isCJK()`) | 摇滚、电子、先锋实验、强烈情绪爆发曲目（如《精卫》副歌怒海填石、工业/哲思摇滚） |
-| **`painted-mv`**（手绘水墨/水彩艺术 MV） | [`lqiaoqing/agent-skills` (`skills/painted-mv`)](https://github.com/lqiaoqing/agent-skills/tree/main/skills/painted-mv) | `p5.brush`（12fps 手绘抖动墨线 Boiling Line + 水彩晕染 Fill/Hatch/Flowfield）+ `Ma Shan Zheng` 书法双语卡拉 OK | 国风、民谣、古典诗词、东方神话、抒情叙事曲目（如《精卫》古风叙事段、敦煌/水墨长卷） |
+| **`kinetic-lyric-mv`**（3D/GLSL 高动能排版 MV） | [`lqiaoqing/agent-skills` (`skills/kinetic-lyric-mv`)](https://github.com/lqiaoqing/agent-skills/tree/main/skills/kinetic-lyric-mv) | Three.js WebGL2 + GLSL Raymarching / 版画排线着色器 + Bloom + CJK 逐字格点引擎 (`NotoSansSC`, `isCJK()`) | 摇滚、电子、先锋实验、强烈情绪爆发与哲学演讲意象曲目（工业/哲思摇滚、张力视觉短片） |
+| **`painted-mv`**（手绘水墨/水彩艺术 MV） | [`lqiaoqing/agent-skills` (`skills/painted-mv`)](https://github.com/lqiaoqing/agent-skills/tree/main/skills/painted-mv) | `p5.brush`（12fps 手绘抖动墨线 Boiling Line + 水彩晕染 Fill/Hatch/Flowfield）+ `Ma Shan Zheng` 书法双语卡拉 OK | 国风、民谣、古典诗词、东方文学、抒情叙事曲目（古典诗词长卷、敦煌/水墨写意短片） |
 | **`paper-story`**（多层剪纸木偶戏剧 MV） | [`lqiaoqing/agent-skills` (`skills/paper-story`)](https://github.com/lqiaoqing/agent-skills/tree/main/skills/paper-story) | Canvas 2D 关节木偶骨骼（Articulated Puppet Rig）+ 多层纸雕投影视差 + 6 秒分块断点续传渲染 | 寓言故事、童话暗黑叙事、皮影/剪纸民俗风格短片 |
 
 ### 3.2 艺术歌词 MV 五步标准工序（5-Stage Pipeline）
@@ -74,7 +74,7 @@
      - `says`：这句歌词的字面文本与潜台词；
      - `see`：**如果遮住所有字幕，观众在画面上看到什么具象物体发生了什么具体动作，从而立刻听懂这句歌词？**（例如唱“你我生来像纸一样”，画面必须真有一张白纸被折出折痕、浸水晕开或被火苗舔舐，绝不允许画抽象圆圈）；
      - `keys`：该句中承担情绪重音的 1–2 个核心词（采用字重加粗、字号放大 `1.3x–1.8x`、朱砂印章色 `#C83E31` 或物理碎裂动效突出，**中文字体严禁使用伪斜体 faux-italic**）。
-   - **一镜到底世界观（One World + Continuous Camera / `long_scroll`）**：全曲建立一个连续演进的视觉世界（如《精卫》从枯枝微光 -> 坠海化鸟 -> 衔木投石 -> 怒海焚天），镜头以 `barN`（第 N 小节首拍）或 `lineM@关键词` 为符号锚点平滑推拉横移，杜绝每句歌词硬切一个毫无关联的背景。
+   - **一镜到底世界观（One World + Continuous Camera / `long_scroll`）**：全曲建立一个连续演进的视觉世界（由 `Gemini 4 Carbon` 单栈直驱连续叙事长卷，如从枯枝微光 -> 破浪新生 -> 星火燎原的具象演变），镜头以 `barN`（第 N 小节首拍）或 `lineM@关键词` 为符号锚点平滑推拉横移，杜绝每句歌词硬切一个毫无关联的背景。
 3. **Stage 3 — 15–30 秒高潮样片先行与三阶网格看片（Sample First & Grid Preview）**：
    - 在铺开全曲 3–4 分钟代码前，先用 `render.py lines`（每句歌词中心帧生成一张带歌词标注的 4K/1080p 网格图）与 `render.py bars`（前奏+第一段主副歌 30 秒样片）验证画风、字号与鼓点响应。
    - **审美红线（`film_gate.py` 机器门禁）**：

@@ -37,7 +37,7 @@ except ImportError:
     json.dump(
         {
             "success": False,
-            "error": "缺少 httpx；请修复 ~/.agents/config/python-runtimes.json 声明的 research-search 受管环境",
+            "error": "缺少 httpx；请运行 /opt/homebrew/bin/uv sync --project ~/.agents/runtimes/research-search 修复 research-search 受管环境",
         },
         sys.stdout,
         ensure_ascii=False,

@@ -83,6 +83,9 @@
 
 ## 四、 Telegram MTProto 个人号安全边界与防掉线/防封号红线
 
+> **[证据保留与只读合规门禁]**
+> 在需要原状留存历史通讯记录或冻结在线会话期间：严禁发起在线 MTProto 自动化连接或写入操作；严禁删除或篡改任何本地聊天数据库与已归档审计报告；严禁接入任何 OSINT / 社工库服务。
+
 ### 1. 核心风险机理
 - **SQLite `.session` 并发读写与 `msg_seqno` 冲突**：Telethon 使用本地 SQLite 文件（`~/Library/Application Support/tg-cli/tg_cli.session`）维护 MTProto 授权密钥与递增序列号。若两个进程同时连接同一个 `.session`，会导致 `sqlite3.OperationalError: database is locked` 或向 Telegram 服务端发送乱序 `msg_seqno`，触发服务端立即销毁该设备 Session（表现为你刚扫码登录就被踢下线）。
 - **公共 `api_id=2040` 高频单点写风暴风控**：当使用公共桌面 `api_id` 执行无节流的逐个退群（`delete_dialog`）、逐个修改通知设置（`UpdateNotifySettingsRequest`）或高频拉取陌生 Entity 时，Telegram 反垃圾引擎会下发长时 `FloodWaitError`（数十分钟至数小时）甚至直接注销当前登录会话。

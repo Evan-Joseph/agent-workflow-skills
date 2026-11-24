@@ -1,7 +1,0 @@
-interface:
-  display_name: "Harness 与技能治理"
-  short_description: "多 Harness 环境配置、技能清单同步与健康审计总控"
-  default_prompt: "Use $harness-governance to audit, sync, scaffold, or optimize local Harness environments and skills inventory."
-  icon_small: "./assets/skill-icon-glyph.svg"
-  icon_large: "./assets/skill-icon-glyph.svg"
-  brand_color: "#EA580C"

@@ -1,6 +1,6 @@
 ---
 name: document-crafting
-description: "高保真长文档协作起草、审阅、排版与多格式交付中枢（已融合原 doc-coauthoring 与 report-format-discovery）。覆盖方案/PRD/技术规格/RFC/决策文档协作撰写、报告结构规范发现、Word/Docx 格式规范与 docx-tool (docx_template_tool.py) 零破坏引擎、OnlyOffice 转换、Markdown 转离线排版 HTML 报告、以及基于 LaTeX/Docx 的高质量 PDF 交付。在需要起草或审阅长文档、生成正式公文报告、格式转换或检查排版质量时使用。"
+description: "高保真长文档协作起草、审阅、排版与多格式交付中枢（已融合原 doc-coauthoring 与 report-format-discovery）。覆盖方案/PRD/技术规格/RFC/决策文档协作撰写、报告结构规范发现、Word/Docx 格式规范与 docx-tool (docx_template_tool.py) 零破坏引擎、docx2pdf (Microsoft Word 官方引擎) 无头导出、Markdown 转离线排版 HTML 报告、以及基于 LaTeX/Docx 的高质量 PDF 交付。在需要起草或审阅长文档、生成正式公文报告、格式转换或检查排版质量时使用。"
 metadata:
   short-description: 长文档协作起草审阅、Word/Docx排版与高质量PDF/HTML交付
 ---
@@ -22,7 +22,7 @@ metadata:
 
 ## 运行时契约与环境约束 (Runtime Contract)
 
-- **统一解释器**：必须固定使用 `python3`（对应 `~/.agents/config/python-runtimes.json` 中的 `miniconda-agent-general` 运行时，已预装 `python-docx`、`pypdf`、`markdown`、`reportlab` 等）。
+- **统一解释器**：必须固定使用 `python3`（本机受管 `miniconda-agent-general` 通用 Python 运行时，已预装 `python-docx`、`pypdf`、`markdown`、`reportlab` 等）。
 - **执行命令范例**：
   ```bash
   python3 $HOME/.agents/skills/document-crafting/scripts/render_report.py input.md output.html --with-js
@@ -31,8 +31,8 @@ metadata:
 - **Agent 防呆红线**：
   - 严禁调用时自作主张创建临时虚拟环境（如 `python -m venv .venv` 或 `conda create`）；
   - 严禁在 Skill 目录或解释器中随意执行 `pip install`；
-  - 遇到依赖或环境异常，停止执行并统一按 `python-runtimes.json` 规范维护单一真相源，或向用户汇报。
-- **外部编译器与套件**：LaTeX 学术排版使用 `/Library/TeX/texbin/pdflatex` 或 `/Library/TeX/texbin/xelatex`；公文与文档套件日常交互使用 ONLYOFFICE 或 Microsoft Word；Agent 结构化创建与模板保真编辑统一使用 `docx-tool`（即 `scripts/docx_template_tool.py`），无头转 PDF 使用 `docx2pdf`。
+  - 遇到依赖或环境异常，停止执行并核对 `python3` 受管环境状态，或向用户汇报。
+- **外部编译器与套件**：LaTeX 学术排版使用 `/Library/TeX/texbin/pdflatex` 或 `/Library/TeX/texbin/xelatex`；公文与文档套件日常交互使用 Microsoft Word（中文正式排版严禁以 ONLYOFFICE/LibreOffice 替代 Word）；Agent 结构化创建与模板保真编辑统一使用 `docx-tool`（即 `scripts/docx_template_tool.py`），无头转 PDF 使用 `docx2pdf`。
 
 ## 核心交付铁律（高质量 PDF 准则）
 

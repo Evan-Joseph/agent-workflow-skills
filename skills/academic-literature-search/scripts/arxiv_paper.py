@@ -39,7 +39,7 @@ def ensure_bs4() -> None:
     except ImportError:
         print_json({
             "success": False,
-            "error": "缺少 beautifulsoup4；请修复 ~/.agents/config/python-runtimes.json 声明的 research-search 受管环境",
+            "error": "缺少 beautifulsoup4；请运行 /opt/homebrew/bin/uv sync --project ~/.agents/runtimes/research-search 修复 research-search 受管环境",
         })
         sys.exit(1)
 

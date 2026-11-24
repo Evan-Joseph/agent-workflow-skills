@@ -62,6 +62,6 @@ reach-hub 52pojie read "<tid_or_url>"
 ## 四、 安全、反爬识别与防毒化媒体红线
 
 1. **只读与零残留**：严禁自动点赞/发帖/私信；所有 `:9223` 后台采集自动归入简洁中文语义组并在 `finally` 中调用 `/cleanup` 清零（`agentTabsCount == 0`）；严禁回显真实 Cookie。
-2. **反爬壳诚实披露**：遇到 `Just a moment...`、`403` 或验证码壳页时如实标记“正文未获取”，严禁将拦截页当正文或脑补招生简章/政策数字。
-3. **抖音图文区分与防 `2011 INVALID_MEDIA` 铁律**：抖音图文（`aweme_type=68`）的 `video.play_addr` 实为 `.m4a` 音频，真实图片在 `image_urls`；任何下载文件喂给 `read_file` 前必须经 `ffmpeg -y -i <in> -vf "scale='min(960,iw)':-1" -frames:v 1 -q:v 6 <out.jpg>` 转为 `<150 KB` 真实 Baseline JPEG（`\xff\xd8\xff`），误触报错时立即调 `fix_agy_invalid_media.py --write`。
+2. **反爬壳诚实披露与 `[L10]` 时效核验**：遇到 `Just a moment...`、`403` 或验证码壳页时如实标记“正文未获取”，严禁将拦截页当正文或脑补招生简章/政策数字；查询外部羊毛、平台规则、爆款数据与社区贴时，必先核实发布/更新日期与帖锁状态，仅采信有效期内的一手信源。`52pojie.cn` 仅用 `anysearch`/`reach-hub` 定位后于 `:9223` 低频单帖精读，禁高频爬站触发瑞数 WAF。
+3. **抖音图文区分与防 `2011 INVALID_MEDIA` 铁律**：抖音图文（`aweme_type=68`）的 `video.play_addr` 实为 `.m4a` 音频，真实图片在 `image_urls`；任何下载文件喂给 `read_file` 前必须经 `ffmpeg -y -i <in> -vf "scale='min(960,iw)':-1" -frames:v 1 -q:v 6 <out.jpg>` 转为 `<150 KB` 真实 Baseline JPEG（`\xff\xd8\xff`），避免未校验媒体文件污染会话上下文。
 4. **相邻技能分工**：结构化企业/法规/专利查 `anysearch`；学术文献查 `academic-literature-search`；GitHub/HF 查 `developer-resource-search`；逆向工程联合 `linuxdo` 与 `52pojie` 低频单帖精读。

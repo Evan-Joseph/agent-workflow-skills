@@ -49,3 +49,8 @@ metadata:
 2. **控制台与交互检查**：确认 Console 零报错/零 404，实测展开态无裁切、开关 `On -> Off -> On` 往返生效；
 3. **多视口 `<150 KB` 截图**：截取桌面（`1440×900`）与移动端（`390×844` / `844×390`）压缩为 `<150 KB` 真实 JPEG/PNG；
 4. **亲自调 `read_file` 肉眼审图**：站在首次访问的用户视角逐张审视对齐、圆角、留白与换行（细则见 [`references/ui-craft-and-qa-gates.md`](./references/ui-craft-and-qa-gates.md)），清零瑕疵后再交付。
+
+## 五、 零现金高审美直出与防锚定污染铁律（已彻底弃用 Arena.ai 网页盲测抽卡）
+
+1. **严禁低档模型搭骨架**：严禁“先用低档模型写粗糙 HTML/CSS 骨架、再交旗舰模型精修”（必引发不可逆的审美锚定污染），亦严禁给强模型投喂残缺伪代码、半成品占位或篡改后的设计原典；同时严禁回退调用已上线积分墙并封禁教育邮的 `Arena.ai`（WebDev Arena / LMArena）网页盲测。
+2. **本机单栈一次成型**：日常高审美 Web/App 界面直接由原厂 `Antigravity` 搭载 **`Gemini 4 Carbon`**（视觉审美与排版张力）+ **`Gemini 4 Neon`**（复杂交互工程）端到端一次直出，按需结合 `Mobbin` 真机交互流对标；仅旗舰级门面或用户点名任务方经批准点射 `claude-magpie -p`（`group/opus` / `group/fable`）。

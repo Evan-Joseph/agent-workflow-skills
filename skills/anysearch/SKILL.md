@@ -11,7 +11,7 @@ metadata:
 
 ## 运行时契约与环境约束
 
-- **统一解释器**：必须固定使用 `python3`（对应 `~/.agents/config/python-runtimes.json` 中的 `miniconda-agent-general` 运行时）。
+- **统一解释器**：必须固定使用 `python3`（本机受管 `miniconda-agent-general` 通用 Python 运行时）。
 - **执行命令范例**：
   ```bash
   python3 $HOME/.agents/skills/anysearch/scripts/anysearch_cli.py search "query" --max_results 5
@@ -19,7 +19,7 @@ metadata:
 - **Agent 防呆红线**：
   - 严禁调用时自作主张创建临时虚拟环境（如 `python -m venv .venv` 或 `conda create`）；
   - 严禁在 Skill 目录或解释器中随意执行 `pip install`；
-  - 遇到依赖或环境异常，停止执行并统一按 `python-runtimes.json` 规范维护单一真相源，或向用户汇报。
+  - 遇到依赖或环境异常，停止执行并核对 `python3` 受管环境状态，或向用户汇报。
 - **凭据与网络安全**：网络请求继承标准代理环境变量；不得在日志或错误信息中输出凭据；CLI 直接调用官方 REST 端点，不走已废弃的 JSON-RPC 通道。
 
 ## 路由
@@ -58,7 +58,7 @@ AnySearch 自身不应打开浏览器标签页。若核验原始来源必须升�
 
 ### 通用检索（多源阶梯路由）
 
-默认自动按阶梯降级策略调度（一级 DeepSeek/博查 → 二级 AnySearch/Tavily → 三级 Bing RSS 兜底）：
+默认自动按阶梯降级策略调度（一级 Brave Search API → 二级 AnySearch → 三级 Bing RSS 兜底；DeepSeek 官方搜索 `402`、博查 `403`、Tavily `401` 已移出默认自动链路）：
 
 ```bash
 # 默认分层路由（高信噪比 Markdown 格式）
@@ -67,8 +67,8 @@ python3 $HOME/.agents/skills/anysearch/scripts/anysearch_cli.py search "query" -
 # 指定返回机器友好的结构化 JSON
 python3 $HOME/.agents/skills/anysearch/scripts/anysearch_cli.py search "query" --max_results 5 --json
 
-# 显式指定搜索源通道（auto | deepseek | bocha | anysearch | bing）
-python3 $HOME/.agents/skills/anysearch/scripts/anysearch_cli.py search "query" --provider bocha --max_results 5
+# 显式指定搜索源通道（auto | brave | anysearch | bing | deepseek | bocha）
+python3 $HOME/.agents/skills/anysearch/scripts/anysearch_cli.py search "query" --provider brave --max_results 5
 ```
 
 ### 垂直领域检索（AnySearch 专有能力）
@@ -82,9 +82,9 @@ python3 $HOME/.agents/skills/anysearch/scripts/anysearch_cli.py search "query" -
 
 `--domain --sub_domain --sdp` 仍可兼容旧调用；新调用优先使用 `--tag --params`。`--zone cn|intl` 和 `--language zh-CN` 可按检索需求补充。
 
-### 页面正文抓取（DeepSeek Fetch → `r.jina.ai` 降级 + 反爬壳检测）
+### 页面正文抓取（`r.jina.ai` → AnySearch `/v1/extract` 降级 + 反爬壳检测）
 
-自动识别并拦截 Cloudflare `Just a moment...` 等反爬空壳页面，优先走 DeepSeek Fetch，失败或遇空壳自动降级至 `https://r.jina.ai/<url>` 与 `/v1/extract`（通用检索 `--max_results` 上限支持至 `20`）：
+自动识别并拦截 Cloudflare `Just a moment...` 等反爬空壳页面，优先走 `https://r.jina.ai/<url>`，失败或遇空壳自动降级至 AnySearch `/v1/extract`（通用检索 `--max_results` 上限支持至 `20`）：
 
 ```bash
 python3 $HOME/.agents/skills/anysearch/scripts/anysearch_cli.py extract "https://example.com/page"
@@ -92,7 +92,7 @@ python3 $HOME/.agents/skills/anysearch/scripts/anysearch_cli.py extract "https:/
 
 ## 输出处理
 
-1. 保留标题、URL、来源机构和时间信息。
+1. 保留标题、URL、来源机构与发布/更新时间；调研外部羊毛、平台政策、爆款数据与开源项目时，必须显式核实发布/更新日期与当前帖锁状态，只采信真实有效期的最新一手信源。
 2. 区分搜索结果、原始来源和模型推断。
 3. 对关键事实打开原始来源或用第二通道核验。
 4. 厂商基准、营销案例和评分不能作为独立证据。
@@ -100,10 +100,10 @@ python3 $HOME/.agents/skills/anysearch/scripts/anysearch_cli.py extract "https:/
 
 ## 凭据管理与零配置保障
 
-1. **博查（Bocha）**：读取环境变量、`~/.config/anysearch/anysearch.env` 中的 `BOCHA_API_KEY`，或 macOS Keychain（`bocha-api-key`）。
-2. **DeepSeek**：读取环境变量 `DEEPSEEK_API_KEY`、`anysearch.env` 或 macOS Keychain（`deepseek-api-key`）。
-3. **AnySearch / Tavily**：读取 `~/.config/anysearch/anysearch.env` 或 `--api_key`。
-4. **Bing RSS**：纯净直出，零凭据、零速率限制、高可用。
+1. **Brave Search（一级主力，每月免费 2,000 次独立索引）**：读取环境变量 `BRAVE_API_KEY` / `BRAVE_SEARCH_API_KEY` 或 macOS Keychain（`cc-web-mcp-brave-search-api-key`）。
+2. **AnySearch（二级主力与垂直领域检索）**：读取 `~/.config/anysearch/anysearch.env` 或 `--api_key`。
+3. **Bing RSS（三级免 Key 兜底）**：纯净直出，零凭据、零速率限制、高可用。
+4. **已停用渠道（移出 `auto` 默认链）**：`DeepSeek` 官方 `/v1/tools/search`（余额 `¥0.00` 报 `402` 停用）、`博查（Bocha）`（`403` 额度耗尽停用）、`Tavily`（`401` 且存在 `CN¥2,092.81` 历史拒付挂账，**严禁绑卡恢复**）。
 
 不得把 Key 写进 Skill 目录、命令历史、报告或日志。不得自动注册账号或自动创建 Key。
 
