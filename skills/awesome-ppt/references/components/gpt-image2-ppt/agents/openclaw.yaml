@@ -10,5 +10,5 @@ interface:
 #     VISION_BASE_URL endpoint you set (template-clone mode only).
 #   - Downloads images returned by the model API; URLs are printed before
 #     download, capped at 50MB, http/https only.
-#   - Spawns LibreOffice (native or docker) to render template .pptx -> PNG.
+#   - Renders template .pdf (or Microsoft PowerPoint AppleScript export -> PDF) to PNG via pymupdf/pdf2image.
 #   - Writes outputs to <cwd>/{template_renders,template_cache,outputs}/.
