@@ -106,6 +106,15 @@ def cdp_http_json(
         except Exception:
             parsed = {"ok": False, "error": raw.strip() or f"http_{exc.code}"}
         return exc.code, parsed
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        reason = getattr(exc, "reason", None) or exc
+        return 503, {
+            "ok": False,
+            "error": "cdp_daemon_unreachable",
+            "detail": str(reason),
+            "cdpUrl": cdp_url,
+            "hint": "请确认 com.agents.chrome-cdp-daemon 在线且 Google Chrome 已运行，可执行 `cdp-ctl sync-endpoint --connect` 重同步。",
+        }
 
 
 def sync_devtools_endpoint(
@@ -166,8 +175,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_sync = sub.add_parser("sync-endpoint", help="Sync Chrome DevToolsActivePort UUID into 0600 mirror & :9223")
     p_sync.add_argument("--connect", action="store_true", help="Also trigger single-flight connectWS() on :9223")
 
-    sub.add_parser("health", help="Sync endpoint (if readable) and query GET /health")
-    sub.add_parser("tabs", help="Sync endpoint (if readable) and query GET /tabs")
+    p_health = sub.add_parser("health", help="Query GET /health daemon status")
+    p_health.add_argument("--summary", action="store_true", help="Print concise single-line human summary")
+
+    sub.add_parser("snapshot", help="Query GET /snapshot runtime state without syncing endpoint")
+
+    p_tabs = sub.add_parser("tabs", help="Sync endpoint (if readable) and query GET /tabs")
+    p_tabs.add_argument("--summary", action="store_true", help="Print concise tabular tab summary")
+
     sub.add_parser("reconnect", help="Sync endpoint and trigger POST /reconnect")
 
     p_open = sub.add_parser("open", help="Open or reuse background tab inside a collapsed semantic tab group")
@@ -214,6 +229,34 @@ def main(argv: list[str] | None = None) -> int:
         res = sync_devtools_endpoint(args.cdp_url, notify_daemon=True, connect=args.connect)
         print(json.dumps(res, ensure_ascii=False, indent=2))
         return 0 if res.get("ok") else 1
+
+    if args.cmd == "close" and not (args.target_id or args.url_sub):
+        print(
+            json.dumps(
+                {
+                    "ok": False,
+                    "error": "missing_close_selector",
+                    "hint": "请指定 `--target-id <ID>` 或 `--url-sub <URL子串>`（批量按任务回收请用 `cdp-ctl cleanup --task <ID>`）。",
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 2
+
+    if args.cmd == "cleanup" and not (args.task or args.group or args.target_id or args.all_agents):
+        print(
+            json.dumps(
+                {
+                    "ok": False,
+                    "error": "missing_cleanup_selector",
+                    "hint": "请指定 `--task <ID>`、`--group <组名>`、`--target-id <ID>` 或显式传入 `--all-agents`。",
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 2
 
     if args.cmd not in ("health", "snapshot"):
         sync_devtools_endpoint(args.cdp_url, notify_daemon=True, connect=False)
@@ -288,7 +331,21 @@ def main(argv: list[str] | None = None) -> int:
     else:
         return 2
 
-    print(json.dumps(data, ensure_ascii=False, indent=2))
+    if getattr(args, "summary", False) and isinstance(data, dict) and data.get("ok") is not False:
+        if args.cmd == "health":
+            print(
+                f"[cdp-9223] ok={data.get('ok')} v{data.get('version')} "
+                f"connected={data.get('connected')} lazyConnect={data.get('lazyConnect')} "
+                f"agentTabsCount={data.get('agentTabsCount')}"
+            )
+        elif args.cmd == "tabs":
+            tabs = data.get("tabs") or []
+            print(f"[cdp-9223] totalTabs={data.get('totalTabs', len(tabs))} agentTabsCount={data.get('agentTabsCount', 0)}")
+            for t in tabs:
+                tag = f"AGENT:{t.get('task') or '-'}/{t.get('group') or '-'}" if t.get("isAgentTab") else "USER"
+                print(f"  - [{tag}] {str(t.get('targetId', ''))[:8]}  {str(t.get('title') or '')[:36]}  ({str(t.get('url') or '')[:64]})")
+    else:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
     if not (200 <= code < 300):
         return 1
     if isinstance(data, dict):

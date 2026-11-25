@@ -84,8 +84,8 @@ for skill in skills/*; do
   count=$((count + 1))
 done
 
-if [ "$count" -ne 22 ]; then
-  echo "FAIL: Expected exactly 22 skills under skills/, found $count" >&2
+if [ "$count" -ne 23 ]; then
+  echo "FAIL: Expected exactly 23 skills under skills/, found $count" >&2
   exit 1
 fi
 
@@ -94,7 +94,7 @@ import ast, pathlib
 py_files = list(pathlib.Path("skills").rglob("*.py")) + list(pathlib.Path("scripts").rglob("*.py"))
 for p in py_files:
     ast.parse(p.read_text(encoding="utf-8"), filename=str(p))
-print(f"  Verified {len(py_files) - 1} skill Python scripts (+1 compiler) with ast.parse() across 22 skills.")
+print(f"  Verified {len(py_files) - 1} skill Python scripts (+1 compiler) with ast.parse() across 23 skills.")
 PY
 
 echo "[6/6] Checking Markdown relative links across all .md files..."
@@ -126,4 +126,4 @@ if broken:
 print(f"  Verified 0 broken relative links across {len(md_files)} Markdown files.")
 PY
 
-echo "ALL CHECKS PASSED (exit 0) — 22 clean public skills ready."
+echo "ALL CHECKS PASSED (exit 0) — 23 clean public skills ready."

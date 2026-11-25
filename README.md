@@ -1,20 +1,20 @@
 # Agent Workflow Skills
 
 [![Agent Skills](https://img.shields.io/badge/format-SKILL.md-1f6feb?style=flat-square)](https://agentskills.io)
-[![Skills](https://img.shields.io/badge/skills-22-2ea043?style=flat-square)](#available-skills)
-[![Python Scripts](https://img.shields.io/badge/python_scripts-94-3776ab?style=flat-square&logo=python&logoColor=white)](#repository-structure)
+[![Skills](https://img.shields.io/badge/skills-23-2ea043?style=flat-square)](#available-skills)
+[![Python Scripts](https://img.shields.io/badge/python_scripts-95-3776ab?style=flat-square&logo=python&logoColor=white)](#repository-structure)
 [![License](https://img.shields.io/badge/license-Apache--2.0-d29922?style=flat-square)](./LICENSE)
 
-A collection of 22 portable skills for AI coding agents, following the [Agent Skills (`SKILL.md`)](https://agentskills.io) format. Each skill folder packages concise instructions (`< 12 KB`), on-demand `references/` guides, and executable Python utilities (`94` scripts total) compatible with **Claude Code**, **OpenAI Codex**, **Google Antigravity**, **Gemini CLI**, and other `SKILL.md`-enabled agents.
+A collection of 23 portable skills for AI coding agents, following the [Agent Skills (`SKILL.md`)](https://agentskills.io) format. Each skill folder packages concise instructions (`< 12 KB`), on-demand `references/` guides, and executable Python utilities (`95` scripts total) compatible with **Claude Code**, **OpenAI Codex**, **Google Antigravity**, **Gemini CLI**, and other `SKILL.md`-enabled agents.
 
-面向 AI 编程智能体的 22 个便携式标准技能包（遵循 `SKILL.md` 规范），覆盖学术文献检索与投稿检查、全栈工程与前端界面设计、长文档/演示文稿/音视频处理、浏览器自动化与多端开发配置管理，附带 94 个可执行 Python 工具脚本。
+面向 AI 编程智能体的 23 个便携式标准技能包（遵循 `SKILL.md` 规范），覆盖学术文献检索与投稿检查、全栈工程与前端界面设计、长文档/演示文稿/音视频处理、浏览器自动化与多端开发配置管理，附带 95 个可执行 Python 工具脚本。
 
 ## Installation
 
 ### Skills CLI (`npx skills`)
 
 ```bash
-# Install all 22 skills
+# Install all 23 skills
 npx skills add Evan-Joseph/agent-workflow-skills
 
 # Install a single skill
@@ -56,6 +56,7 @@ cp -R /tmp/agent-workflow-skills/skills/* "$HOME/.agents/skills/"
 | [`browser-routing`](./skills/browser-routing) | Browser automation conventions across headless Playwright, persistent Chrome CDP tab-group relays (`cdp_ctl.py`), Camoufox (`camoufox_profile.py`), and non-intrusive CAPTCHA human-handoff alerts (`notify_human_handoff.py`). |
 | [`cloudflare`](./skills/cloudflare) | Reference guides and quota checks for Cloudflare Workers, Pages, D1, KV, R2, Durable Objects (WebSocket Hibernation), Workflows, and Wrangler (`cf_health_and_quota.py`). |
 | [`artex-client`](./skills/artex-client) | Zero-dependency REST CLI (`artex_cli.py`) with `0600` local JWT caching and a four-element finding verification gate (`Trust Boundary -> Affected Principal -> Concrete Reproduction -> Minimal Fix`) for authorized security evaluations. |
+| [`quick-colleague`](./skills/quick-colleague) | Cross-session queued CLI workflow and budget circuit breakers for local desktop coding assistants (`--pure-reply` single-turn extraction, `quick.lock` serialization, and Stop-before-archive timeout guards). |
 | [`local-machine-profile`](./skills/local-machine-profile) | Three-tier workstation SSOT pattern separating static verified baselines, live read-only environment probes (`collect_env_baseline.py`), and project ledger pointers without storing plaintext credentials. |
 
 ### Documents, Slides, Images & Video
@@ -86,7 +87,7 @@ cp -R /tmp/agent-workflow-skills/skills/* "$HOME/.agents/skills/"
 agent-workflow-skills/
 ├── .claude-plugin/marketplace.json   # Claude Code plugin marketplace manifest
 ├── .codex-plugin/plugin.json         # OpenAI Codex plugin manifest
-├── skills/                           # 22 self-contained SKILL.md directories
+├── skills/                           # 23 self-contained SKILL.md directories
 ├── scripts/
 │   ├── export_public_skills.py       # Sanitization & manifest sync script
 │   └── check.sh                      # Validation gate (YAML, Python AST, links & privacy)

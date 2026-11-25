@@ -1,7 +1,7 @@
 {
   "name": "agent-workflow-skills",
-  "version": "2.2.0",
-  "description": "22 portable SKILL.md agent skills with executable Python scripts and reference guides.",
+  "version": "2.3.0",
+  "description": "23 portable SKILL.md agent skills with executable Python scripts and reference guides.",
   "license": "Apache-2.0",
   "repository": "https://github.com/Evan-Joseph/agent-workflow-skills",
   "skillsDir": "skills",
@@ -105,6 +105,11 @@
       "name": "quarkpan-resource-access",
       "path": "skills/quarkpan-resource-access",
       "description": "用于夸克网盘（Quark Cloud Drive）分享链接核查、个人网盘文件检索、分享元数据只读读取及受批资源大文件 Range 断点续传下载（统一通过本机受管 CLI quarkpan-qr 执行）。"
+    },
+    {
+      "name": "quick-colleague",
+      "path": "skills/quick-colleague",
+      "description": "Cross-session queued CLI delegation pattern and budget circuit-breaker protocol (`--pure-reply` single-turn code extraction and bounded `<=8` surgical workspace edits) for local desktop coding assistants."
     },
     {
       "name": "shuorenhua",

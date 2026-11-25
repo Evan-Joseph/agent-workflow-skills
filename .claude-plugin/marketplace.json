@@ -5,14 +5,14 @@
     "url": "https://github.com/Evan-Joseph"
   },
   "metadata": {
-    "description": "22 portable SKILL.md agent skills with executable Python scripts and reference guides for Claude Code, Codex, and compatible AI coding agents.",
-    "version": "2.2.0",
+    "description": "23 portable SKILL.md agent skills with executable Python scripts and reference guides for Claude Code, Codex, and compatible AI coding agents.",
+    "version": "2.3.0",
     "license": "Apache-2.0"
   },
   "plugins": [
     {
       "name": "agent-workflow-skills",
-      "description": "22 portable Agent Skills covering academic literature search, software engineering quality, document/PPT/video workflows, frontend UI, browser automation, and Cloudflare.",
+      "description": "23 portable Agent Skills covering academic literature search, software engineering quality, document/PPT/video workflows, frontend UI, browser automation, and Cloudflare.",
       "source": "./",
       "strict": false,
       "skills": [
@@ -36,6 +36,7 @@
         "./skills/mobile-device-ops",
         "./skills/paper-publication-copilot",
         "./skills/quarkpan-resource-access",
+        "./skills/quick-colleague",
         "./skills/shuorenhua",
         "./skills/video-use"
       ]

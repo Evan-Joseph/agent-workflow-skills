@@ -30,6 +30,784 @@ MERMAID_BLOCK_RE = re.compile(
 MERMAID_CDN = "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"
 
 
+REPORT_CSS = """/* Hallmark · checked: 2026-11-26 · shape: app screen · genre: modern-minimal · built: the project · redesign: polish · v2.0.0 */
+
+/* ---------- Tokens · light paper ---------- */
+:root {
+  color-scheme: light;
+
+  --bg: #f6f6f3;
+  --paper: #fcfcfa;
+  --surface: #f9f9f6;
+  --surface-muted: #f0f0ec;
+  --surface-hover: #e9e9e3;
+
+  --ink: #181a1f;
+  --ink-soft: #3a3d45;
+  --muted: #646872;
+
+  --line: #e3e3dd;
+  --line-strong: #cdcdc5;
+
+  --accent: #0f766e;
+  --accent-hover: #0b5d56;
+  --accent-ink: #fcfcfa;
+  --accent-wash: #e4f1ef;
+  --accent-line: #9cc9c4;
+  --selection: #cfe8e4;
+
+  --code-surface: #f2f2ee;
+  --code-ink: #24272e;
+  --inline-code-surface: #ecece7;
+
+  --disabled-surface: #ecece8;
+  --disabled-ink: #5d616b;
+
+  --focus: #0f766e;
+
+  --font-sans: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Source Serif 4", "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+
+  --measure: 760px;
+  --toc-width: 248px;
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur: 160ms;
+
+  accent-color: var(--accent);
+}
+
+/* ---------- Tokens · deep slate ---------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0d1014;
+  --paper: #14181f;
+  --surface: #11151b;
+  --surface-muted: #1a1f27;
+  --surface-hover: #222833;
+
+  --ink: #eef0f4;
+  --ink-soft: #c9cdd5;
+  --muted: #8d939e;
+
+  --line: #262c36;
+  --line-strong: #363d4a;
+
+  --accent: #2dd4bf;
+  --accent-hover: #5eead4;
+  --accent-ink: #0d1014;
+  --accent-wash: #112e2b;
+  --accent-line: #1f6f66;
+  --selection: #154a44;
+
+  --code-surface: #0f1318;
+  --code-ink: #dfe3ea;
+  --inline-code-surface: #1d232c;
+
+  --disabled-surface: #1a1f27;
+  --disabled-ink: #9299a6;
+
+  --focus: #2dd4bf;
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.75;
+  font-feature-settings: "kern", "liga";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--selection);
+  color: var(--ink);
+}
+
+/* ---------- Reading progress ---------- */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 80ms linear;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ---------- Layout ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: var(--toc-width) minmax(0, 1fr);
+  gap: 48px;
+  align-items: start;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+main {
+  min-width: 0;
+  padding: 48px 64px 64px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+article {
+  max-width: var(--measure);
+  margin: 0 auto;
+  overflow-wrap: break-word;
+}
+
+/* ---------- Table of contents ---------- */
+.toc-panel {
+  position: sticky;
+  top: 32px;
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 12px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) var(--surface);
+}
+
+.toc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 0 8px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.toc-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+
+.toc-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc-panel li {
+  margin: 0;
+  padding: 0;
+}
+
+.toc-panel li ul {
+  margin: 2px 0 4px;
+  padding-left: 12px;
+}
+
+.toc-panel a {
+  display: block;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  text-decoration: none;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.toc-panel li ul a {
+  font-size: 12.5px;
+}
+
+.toc-panel a:hover {
+  background: var(--surface-muted);
+  color: var(--ink);
+}
+
+.toc-panel a:active {
+  background: var(--surface-hover);
+  color: var(--ink);
+}
+
+.toc-panel a.active,
+.toc-panel a[aria-current="true"],
+.toc-panel a[aria-current="location"] {
+  background: var(--accent-wash);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ---------- Theme toggle ---------- */
+.theme-toggle {
+  flex: none;
+  margin: 0;
+  padding: 4px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  background: var(--paper);
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.theme-toggle:hover {
+  background: var(--surface-muted);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.theme-toggle:active {
+  background: var(--surface-hover);
+  color: var(--ink);
+}
+
+.theme-toggle:disabled {
+  background: var(--disabled-surface);
+  color: var(--disabled-ink);
+  border-color: var(--line);
+  cursor: not-allowed;
+}
+
+/* ---------- Headings ---------- */
+article h1,
+article h2,
+article h3,
+article h4 {
+  color: var(--ink);
+  font-weight: 650;
+  text-wrap: balance;
+  scroll-margin-top: 24px;
+}
+
+article h1 {
+  margin: 0 0 32px;
+  padding: 0 0 20px;
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 3.6vw, 40px);
+  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid var(--line);
+}
+
+article h2 {
+  margin: 48px 0 16px;
+  font-size: 24px;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
+}
+
+article h3 {
+  margin: 32px 0 12px;
+  font-size: 19px;
+  line-height: 1.45;
+}
+
+article h4 {
+  margin: 24px 0 8px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+article h1 + h2,
+article h2 + h3,
+article h3 + h4 {
+  margin-top: 24px;
+}
+
+/* ---------- Text ---------- */
+article p {
+  margin: 0 0 16px;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+article strong,
+article b {
+  font-weight: 650;
+  color: var(--ink);
+}
+
+article a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--accent-line);
+  text-underline-offset: 4px;
+  transition: color var(--dur) var(--ease), text-decoration-color var(--dur) var(--ease);
+}
+
+article a:hover {
+  color: var(--accent-hover);
+  text-decoration-color: var(--accent-hover);
+}
+
+article a:active {
+  color: var(--accent-hover);
+  text-decoration-color: var(--accent);
+}
+
+article hr {
+  height: 0;
+  margin: 40px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- Lists ---------- */
+article ul,
+article ol {
+  margin: 0 0 16px;
+  padding-left: 24px;
+}
+
+article li {
+  margin: 0;
+  padding-left: 4px;
+}
+
+article li + li {
+  margin-top: 4px;
+}
+
+article li > ul,
+article li > ol {
+  margin: 4px 0 0;
+}
+
+article li::marker {
+  color: var(--muted);
+}
+
+/* ---------- Blockquote ---------- */
+article blockquote {
+  margin: 24px 0;
+  padding: 16px 20px;
+  background: var(--surface-muted);
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+article blockquote p {
+  color: var(--ink-soft);
+}
+
+article blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- Tables ---------- */
+.table-scroll {
+  margin: 24px 0;
+  overflow-x: auto;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) var(--paper);
+}
+
+.table-scroll table {
+  width: 100%;
+  min-width: 480px;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+
+.table-scroll th,
+.table-scroll td {
+  padding: 8px 16px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+
+.table-scroll th {
+  background: var(--surface-muted);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.table-scroll td:first-child {
+  white-space: nowrap;
+}
+
+.table-scroll td {
+  background: var(--paper);
+  color: var(--ink-soft);
+}
+
+.table-scroll tbody tr:nth-child(even) td {
+  background: var(--surface);
+  color: var(--ink-soft);
+}
+
+.table-scroll tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table-scroll tbody tr:hover td {
+  background: var(--surface-muted);
+  color: var(--ink);
+}
+
+/* ---------- Code ---------- */
+article code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  font-variant-ligatures: none;
+}
+
+article :not(pre) > code {
+  padding: 2px 4px;
+  background: var(--inline-code-surface);
+  color: var(--code-ink);
+  border-radius: 4px;
+}
+
+article pre {
+  margin: 24px 0;
+  padding: 16px 20px;
+  overflow-x: auto;
+  background: var(--code-surface);
+  color: var(--code-ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 13.5px;
+  line-height: 1.65;
+  tab-size: 2;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) var(--code-surface);
+}
+
+article pre code {
+  padding: 0;
+  background: none;
+  color: var(--code-ink);
+  font-size: inherit;
+  border-radius: 0;
+}
+
+/* ---------- Diagrams & media ---------- */
+article .mermaid {
+  margin: 24px 0;
+  padding: 24px;
+  overflow-x: auto;
+  text-align: center;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+article .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+article img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 24px auto;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+/* ---------- Back to top ---------- */
+.back-top {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 40;
+  margin: 0;
+  padding: 8px 16px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-wrap-mode: nowrap;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease), visibility var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+
+.js .back-top {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+}
+
+.js .back-top.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-top:hover {
+  background: var(--surface-muted);
+  color: var(--ink);
+}
+
+.back-top:active {
+  background: var(--surface-hover);
+  color: var(--ink);
+}
+
+.back-top.show:active {
+  transform: translateY(2px);
+}
+
+.back-top:disabled {
+  background: var(--disabled-surface);
+  color: var(--disabled-ink);
+  border-color: var(--line);
+  cursor: not-allowed;
+}
+
+/* ---------- Focus ---------- */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible,
+.toc-panel a:focus-visible,
+.theme-toggle:focus-visible,
+.back-top:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.table-scroll:focus-visible,
+article pre:focus-visible,
+.toc-panel:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .progress,
+  .back-top,
+  .theme-toggle,
+  .toc-panel a,
+  article a {
+    transition: none;
+  }
+
+  .back-top,
+  .back-top.show,
+  .back-top.show:active {
+    transform: none;
+  }
+}
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 1020px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding: 16px 16px 48px;
+  }
+
+  .toc-panel {
+    position: static;
+    max-height: 320px;
+  }
+
+  main {
+    padding: 32px 24px 48px;
+  }
+
+  article h1 {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    font-size: clamp(26px, 6vw, 32px);
+  }
+
+  article h2 {
+    margin-top: 40px;
+    font-size: 21px;
+  }
+
+  article h3 {
+    font-size: 18px;
+  }
+
+  .back-top {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+@media (max-width: 560px) {
+  main {
+    padding: 24px 16px 40px;
+    border-radius: var(--radius);
+  }
+
+  article pre,
+  article .mermaid {
+    padding: 12px 16px;
+  }
+}
+
+/* ---------- Print ---------- */
+@media print {
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 11pt;
+    line-height: 1.6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .progress,
+  .toc-panel,
+  .back-top,
+  .theme-toggle {
+    display: none;
+  }
+
+  .layout {
+    display: block;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  main {
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    border: 0;
+    border-radius: 0;
+  }
+
+  article {
+    max-width: none;
+  }
+
+  article h1,
+  article h2,
+  article h3,
+  article h4 {
+    break-after: avoid;
+  }
+
+  article p,
+  article li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  article pre {
+    overflow: visible;
+    text-wrap-mode: wrap;
+  }
+
+  .table-scroll {
+    overflow: visible;
+  }
+
+  .table-scroll table {
+    min-width: 0;
+  }
+
+  article pre,
+  article blockquote,
+  article img,
+  article .mermaid,
+  .table-scroll tr {
+    break-inside: avoid;
+  }
+
+  article a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+}"""
+
+
 def is_external(src: str) -> bool:
     return bool(re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", src)) or src.startswith("//")
 
@@ -52,12 +830,7 @@ def embed_images(text: str, base_dir: Path) -> str:
 
 
 def normalize_markdown(text: str) -> str:
-    """Make common report Markdown patterns parse consistently.
-
-    Many generated reports write "label:" directly followed by a list with no
-    blank line. Python-Markdown treats that as a paragraph plus literal hyphens,
-    so add the blank line that Markdown parsers expect. Skip fenced code blocks.
-    """
+    """Make common report Markdown patterns parse consistently."""
     text = text.replace("｜", "|")
     lines = text.splitlines()
     normalized: list[str] = []
@@ -141,6 +914,16 @@ def title_from_body(body: str) -> str:
     return re.sub(r"<.*?>", "", match.group(1)).strip() or "Markdown Report"
 
 
+def description_from_body(body: str, fallback: str) -> str:
+    match = re.search(r"<p[^>]*>(.*?)</p>", body, re.S)
+    if match:
+        plain = re.sub(r"<.*?>", "", match.group(1)).strip()
+        plain = re.sub(r"\s+", " ", plain).replace("—", "，").replace("–", "至")
+        if plain:
+            return plain[:140]
+    return f"{fallback} 独立离线排版报告。"
+
+
 def render_mermaid_blocks(body: str) -> tuple[str, int]:
     """Convert fenced mermaid code blocks into Mermaid render targets."""
 
@@ -165,38 +948,27 @@ def build_mermaid_js(source: str) -> str:
   <script>
     (() => {{
       if (!window.mermaid) return;
+      const cs = getComputedStyle(document.documentElement);
+      const token = (k, fb) => (cs.getPropertyValue(k) || '').trim() || fb;
       window.mermaid.initialize({{
         startOnLoad: true,
         securityLevel: 'loose',
         theme: 'base',
         themeVariables: {{
-          primaryColor: '#eef7f5',
-          primaryTextColor: '#1c2430',
-          primaryBorderColor: '#0f766e',
-          lineColor: '#2563eb',
-          secondaryColor: '#eef4f8',
-          tertiaryColor: '#ffffff',
-          mainBkg: '#ffffff',
-          clusterBkg: '#fbfcfe',
-          clusterBorder: '#dbe2ea',
-          edgeLabelBackground: '#ffffff',
-          textColor: '#1c2430',
-          titleColor: '#0f172a',
-          nodeTextColor: '#1c2430',
-          xyChart: {{
-            backgroundColor: '#fbfcfe',
-            titleColor: '#0f172a',
-            xAxisLabelColor: '#475467',
-            xAxisTitleColor: '#344054',
-            xAxisTickColor: '#dbe2ea',
-            xAxisLineColor: '#dbe2ea',
-            yAxisLabelColor: '#475467',
-            yAxisTitleColor: '#344054',
-            yAxisTickColor: '#dbe2ea',
-            yAxisLineColor: '#dbe2ea',
-            plotColorPalette: '#0f766e, #2563eb, #94a3b8, #c2410c'
-          }},
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif'
+          primaryColor: token('--accent-wash', '#e4f1ef'),
+          primaryTextColor: token('--ink', '#181a1f'),
+          primaryBorderColor: token('--accent', '#0f766e'),
+          lineColor: token('--muted', '#646872'),
+          secondaryColor: token('--surface-muted', '#f0f0ec'),
+          tertiaryColor: token('--paper', '#fcfcfa'),
+          mainBkg: token('--paper', '#fcfcfa'),
+          clusterBkg: token('--surface', '#f9f9f6'),
+          clusterBorder: token('--line', '#e3e3dd'),
+          edgeLabelBackground: token('--paper', '#fcfcfa'),
+          textColor: token('--ink', '#181a1f'),
+          titleColor: token('--ink', '#181a1f'),
+          nodeTextColor: token('--ink', '#181a1f'),
+          fontFamily: token('--font-sans', 'sans-serif')
         }}
       }});
     }})();
@@ -204,10 +976,8 @@ def build_mermaid_js(source: str) -> str:
 """
 
 
-def build_js() -> str:
-    return """
-  <script>
-    (() => {
+def build_js(with_js: bool) -> str:
+    scroll_logic = """
       const progress = document.querySelector('.progress');
       const topBtn = document.querySelector('.back-top');
       const links = [...document.querySelectorAll('.toc-panel a[href^="#"]')];
@@ -217,246 +987,75 @@ def build_js() -> str:
 
       function onScroll() {
         const max = document.documentElement.scrollHeight - innerHeight;
-        if (progress) progress.style.width = max > 0 ? `${scrollY / max * 100}%` : '0%';
-        if (topBtn) topBtn.classList.toggle('show', scrollY > innerHeight);
+        const ratio = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+        if (progress) progress.style.transform = `scaleX(${ratio})`;
+        if (topBtn) topBtn.classList.toggle('show', scrollY > innerHeight * 0.6);
 
         let current = headings[0];
         for (const h of headings) {
           if (h.getBoundingClientRect().top <= 120) current = h;
         }
-        links.forEach(a => a.classList.toggle('active', current && a.hash === `#${current.id}`));
+        links.forEach(a => a.classList.toggle('active', Boolean(current && a.hash === `#${current.id}`)));
       }
 
       addEventListener('scroll', onScroll, { passive: true });
       topBtn?.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
       onScroll();
-    })();
+""" if with_js else ""
+
+    return f"""
+  <script>
+    (() => {{
+      const root = document.documentElement;
+      root.classList.add('js');
+      const toggleBtn = document.querySelector('.theme-toggle');
+      const applyTheme = (mode) => {{
+        root.dataset.theme = mode;
+        if (toggleBtn) toggleBtn.textContent = mode === 'dark' ? '浅色' : '深色';
+      }};
+      const saved = (() => {{
+        try {{ return localStorage.getItem('report.theme'); }} catch (_e) {{ return null; }}
+      }})();
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyTheme(saved === 'dark' || (!saved && prefersDark) ? 'dark' : 'light');
+      toggleBtn?.addEventListener('click', () => {{
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+        try {{ localStorage.setItem('report.theme', next); }} catch (_e) {{}}
+      }});
+{scroll_logic}    }})();
   </script>
 """
 
 
 def build_html(title: str, toc: str, body: str, with_js: bool, mermaid_source: str = "none") -> str:
+    safe_title = html.escape(title.replace("—", "：").replace("–", "至"))
+    desc = html.escape(description_from_body(body, title))
     progress = '<div class="progress"></div>' if with_js else ""
-    back_top = '<button class="back-top" type="button" aria-label="返回顶部">↑</button>' if with_js else ""
-    js = build_js() if with_js else ""
+    back_top = '<button class="back-top" type="button" aria-label="返回顶部">顶部</button>' if with_js else ""
+    js = build_js(with_js)
     mermaid_js = build_mermaid_js(mermaid_source)
 
     return f"""<!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{title}</title>
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="{desc}">
+  <title>{safe_title}</title>
   <style>
-    :root {{
-      --bg: #f7f8fb;
-      --paper: #ffffff;
-      --ink: #1c2430;
-      --muted: #667085;
-      --line: #dbe2ea;
-      --accent: #0f766e;
-      --accent-2: #2563eb;
-      --soft: #eef7f5;
-      --shadow: 0 18px 45px rgba(15, 23, 42, .08);
-      --radius: 8px;
-    }}
-    * {{ box-sizing: border-box; }}
-    html {{ scroll-behavior: smooth; }}
-    body {{
-      margin: 0;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at 12% 0%, rgba(15, 118, 110, .09), transparent 30%),
-        linear-gradient(180deg, #f3f7fa 0%, var(--bg) 360px, var(--bg) 100%);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      line-height: 1.75;
-      letter-spacing: 0;
-    }}
-    a {{ color: var(--accent-2); text-decoration: none; }}
-    a:hover {{ text-decoration: underline; }}
-    .progress {{ position: fixed; inset: 0 auto auto 0; width: 0; height: 3px; z-index: 10; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }}
-    .layout {{
-      display: grid;
-      grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
-      gap: 28px;
-      max-width: 1480px;
-      margin: 0 auto;
-      padding: 28px;
-    }}
-    .toc-panel {{
-      position: sticky;
-      top: 20px;
-      align-self: start;
-      max-height: calc(100vh - 40px);
-      overflow: auto;
-      padding: 18px 16px;
-      background: rgba(255, 255, 255, .86);
-      border: 1px solid rgba(219, 226, 234, .9);
-      border-radius: var(--radius);
-      box-shadow: 0 10px 30px rgba(15, 23, 42, .05);
-      backdrop-filter: blur(12px);
-    }}
-    .toc-title {{
-      margin: 0 0 10px;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent);
-      text-transform: uppercase;
-    }}
-    .toc-panel ul {{ list-style: none; padding-left: 0; margin: 0; }}
-    .toc-panel li {{ margin: 3px 0; }}
-    .toc-panel ul ul {{ padding-left: 14px; margin-top: 3px; border-left: 1px solid var(--line); }}
-    .toc-panel a {{
-      display: block;
-      padding: 5px 6px;
-      border-radius: 6px;
-      color: #425466;
-      font-size: 13px;
-      line-height: 1.45;
-    }}
-    .toc-panel a:hover, .toc-panel a.active {{ background: var(--soft); color: var(--accent); text-decoration: none; }}
-    main {{
-      min-width: 0;
-      background: var(--paper);
-      border: 1px solid rgba(219, 226, 234, .9);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }}
-    article {{ padding: 46px min(6vw, 76px) 68px; }}
-    h1 {{
-      margin: -46px min(-6vw, -76px) 34px;
-      padding: 58px min(6vw, 76px) 44px;
-      color: #fff;
-      background: linear-gradient(135deg, #0f766e 0%, #155e75 52%, #1d4ed8 100%);
-      font-size: clamp(30px, 4vw, 52px);
-      line-height: 1.14;
-      font-weight: 800;
-    }}
-    h2 {{
-      margin: 54px 0 18px;
-      padding-top: 8px;
-      border-top: 1px solid var(--line);
-      font-size: clamp(22px, 2.3vw, 30px);
-      line-height: 1.35;
-      color: #0f172a;
-    }}
-    h3 {{ margin: 34px 0 12px; font-size: 21px; color: #17324d; }}
-    h4 {{ margin: 26px 0 10px; font-size: 17px; color: #344054; }}
-    p {{ margin: 12px 0; }}
-    strong {{ color: #0f172a; font-weight: 700; }}
-    hr {{ border: 0; border-top: 1px solid var(--line); margin: 28px 0; }}
-    blockquote {{
-      margin: 18px 0 24px;
-      padding: 12px 16px;
-      color: #475467;
-      background: var(--soft);
-      border-left: 4px solid var(--accent);
-      border-radius: 0 var(--radius) var(--radius) 0;
-    }}
-    ul, ol {{ padding-left: 1.35em; }}
-    li {{ margin: 4px 0; }}
-    .table-scroll {{
-      width: 100%;
-      overflow-x: auto;
-      margin: 18px 0 28px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: #fff;
-    }}
-    table {{
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0;
-      font-size: 14px;
-      line-height: 1.55;
-      table-layout: auto;
-    }}
-    th, td {{
-      min-width: 112px;
-      padding: 11px 13px;
-      border-bottom: 1px solid var(--line);
-      text-align: left;
-      vertical-align: top;
-      background: #fff;
-    }}
-    th {{
-      color: #0f172a;
-      background: #eef4f8;
-      font-weight: 700;
-      white-space: nowrap;
-    }}
-    tr:nth-child(even) td {{ background: #fbfcfe; }}
-    tr:last-child td {{ border-bottom: 0; }}
-    img {{
-      display: block;
-      max-width: 100%;
-      height: auto;
-      margin: 24px auto 8px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: 0 12px 28px rgba(15, 23, 42, .08);
-      background: #fff;
-    }}
-    code {{
-      padding: 2px 5px;
-      border-radius: 5px;
-      background: #f1f5f9;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: .92em;
-    }}
-    pre {{ overflow: auto; padding: 16px; background: #0f172a; color: #e5e7eb; border-radius: var(--radius); }}
-    pre code {{ padding: 0; color: inherit; background: transparent; }}
-    .mermaid {{
-      margin: 26px 0 30px;
-      padding: 18px;
-      overflow-x: auto;
-      text-align: center;
-      background: #fbfcfe;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-    }}
-    .mermaid svg {{ max-width: 100%; height: auto; }}
-    .back-top {{
-      display: none;
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      width: 42px;
-      height: 42px;
-      border: 0;
-      border-radius: 999px;
-      color: #fff;
-      background: var(--accent);
-      box-shadow: 0 8px 22px rgba(15, 23, 42, .2);
-      cursor: pointer;
-    }}
-    .back-top.show {{ display: block; }}
-    @media (max-width: 1020px) {{
-      .layout {{ display: block; padding: 14px; }}
-      .toc-panel {{ position: relative; top: 0; max-height: 280px; margin-bottom: 14px; }}
-      article {{ padding: 28px 18px 42px; }}
-      h1 {{ margin: -28px -18px 28px; padding: 38px 18px 32px; }}
-      th, td {{ min-width: 120px; padding: 10px; }}
-    }}
-    @media print {{
-      body {{ background: #fff; }}
-      .layout {{ display: block; max-width: none; padding: 0; }}
-      .toc-panel, .progress, .back-top {{ display: none !important; }}
-      main {{ border: 0; box-shadow: none; }}
-      article {{ padding: 0; }}
-      h1 {{ margin: 0 0 24px; color: #111827; background: none; padding: 0; }}
-      a {{ color: inherit; }}
-      .table-scroll, table {{ page-break-inside: avoid; }}
-      img, blockquote, pre {{ page-break-inside: avoid; box-shadow: none; }}
-    }}
+{REPORT_CSS}
   </style>
 </head>
 <body>
   {progress}
   <div class="layout">
     <aside class="toc-panel" aria-label="目录">
-      <p class="toc-title">目录</p>
+      <div class="toc-head">
+        <p class="toc-title">目录</p>
+        <button class="theme-toggle" type="button" aria-label="切换明暗主题">深色</button>
+      </div>
       {toc}
     </aside>
     <main>
@@ -504,7 +1103,7 @@ def main() -> int:
         text = embed_images(text, source.parent)
 
     md = markdown.Markdown(
-        extensions=["extra", "toc", "sane_lists", "smarty"],
+        extensions=["extra", "toc", "sane_lists"],
         extension_configs={"toc": {"permalink": False, "separator": "-"}},
     )
     body = md.convert(text)
@@ -513,14 +1112,14 @@ def main() -> int:
     mermaid_source = "none"
     if mermaid_count and args.mermaid_source != "none":
         mermaid_source = "cdn" if args.mermaid_source == "auto" else args.mermaid_source
-    html = build_html(title_from_body(body), md.toc, body, args.with_js, mermaid_source)
+    html_out = build_html(title_from_body(body), md.toc, body, args.with_js, mermaid_source)
 
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(html, encoding="utf-8")
+    output.write_text(html_out, encoding="utf-8")
     print(output)
-    print(f"tables={html.count('<table')}")
-    print(f"images={html.count('<img')}")
-    print(f"embedded_images={html.count('data:image/')}")
+    print(f"tables={html_out.count('<table')}")
+    print(f"images={html_out.count('<img')}")
+    print(f"embedded_images={html_out.count('data:image/')}")
     print(f"mermaid={mermaid_count}")
     if mermaid_source == "cdn":
         print("mermaid_source=cdn")

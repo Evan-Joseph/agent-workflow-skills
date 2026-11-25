@@ -1,41 +1,29 @@
 <!doctype html>
 <!--
   Before and after board for the redesign-screen skill.
-
-  Fill in the JSON in #board-data and change nothing else. The layout, the type
-  and the callout marks are already set here, so a run writes data, not CSS.
-
-  Deliver it either way:
-  - as a PNG: open this file in a browser and capture the .board element at twice
-    the pixel scale, after the panes have loaded. A capture tool that cannot set
-    a device pixel ratio gets the same detail from --board-zoom: 2 below.
-  - as itself: run scripts/embed-images.py on it first, which puts the pane
-    images inside the file, so it opens on its own and goes without them
-
-  Rects are percentages of the pane image they sit on, so they hold at any
-  capture scale. Crops are cut from the same two pane images, so a move needs no
-  screenshot of its own.
 -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Annotated before-and-after screen comparison board with regional crops." />
     <title>Before and after</title>
     <style>
-      /* Mobbin design system tokens, verbatim from ux-audit-tool's shared/design-system.css. */
+      /* Hallmark · checked: 2026-11-26 · shape: app screen · genre: modern-minimal · built: the project · redesign: polish · v2.0.0 */
       :root {
-        --gray-0: #ffffff;
-        --gray-50: #fafafa;
-        --gray-100: #f5f5f5;
-        --gray-150: #ededed;
-        --gray-200: #e5e5e5;
-        --gray-300: #d4d4d4;
-        --gray-400: #a3a3a3;
-        --gray-500: #737373;
-        --gray-600: #525252;
-        --gray-700: #404040;
-        --gray-800: #262626;
-        --gray-900: #171717;
-        --gray-950: #0a0a0a;
+        --gray-0: #fcfcfb;
+        --gray-50: #f7f7f5;
+        --gray-100: #f2f2ef;
+        --gray-150: #e9e9e5;
+        --gray-200: #e2e2dd;
+        --gray-300: #d1d1cb;
+        --gray-400: #a1a19b;
+        --gray-500: #70706b;
+        --gray-600: #52524e;
+        --gray-700: #3f3f3c;
+        --gray-800: #262624;
+        --gray-900: #171716;
+        --gray-950: #0c0d0f;
         --bg: var(--gray-0);
         --bg-subtle: var(--gray-50);
         --bg-muted: var(--gray-100);
@@ -52,6 +40,7 @@
         --warning: #b45309;
         --danger: #b42318;
         --info: #1c5fd4;
+        --disc-shadow: 0 1px 4px rgba(12, 13, 15, 0.28);
         --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
         --fs-11: 11px;
@@ -60,7 +49,6 @@
         --fs-14: 14px;
         --fs-15: 15px;
         --ls-normal: -0.005em;
-        --ls-widest: 0.12em;
         --sp-2: 8px;
         --sp-3: 12px;
         --sp-4: 16px;
@@ -73,11 +61,10 @@
         --r-lg: 12px;
         --r-xl: 16px;
 
-        /* The callout colour, Mobbin's blue. var(--warning) when the product's accent is blue too. */
         --call: var(--info);
-        --call-fg: #fff;
+        --call-fg: var(--gray-0);
         --board-width: 1100px;
-        --board-zoom: 1; /* 2 doubles every pixel, for a capture tool with no scale factor of its own. */
+        --board-zoom: 1;
       }
       :root[data-theme="dark"] {
         --bg: var(--gray-950);
@@ -105,18 +92,26 @@
       html,
       body {
         margin: 0;
+        overflow-x: clip;
         background: var(--bg-subtle);
       }
-      /* Centred when the file is opened; the capture shoots .board alone, so it is unaffected. */
       body {
         display: flex;
         justify-content: safe center;
         padding: var(--sp-10) var(--sp-4);
       }
-      .board {
-        flex: none;
+      a:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--info);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+      a:active,
+      button:active {
+        opacity: 0.82;
       }
       .board {
+        flex: none;
         zoom: var(--board-zoom);
         width: var(--board-width);
         padding: var(--sp-10);
@@ -135,41 +130,37 @@
         display: flex;
         justify-content: space-between;
         gap: var(--sp-4);
-        margin-bottom: var(--sp-6);
-        padding-bottom: var(--sp-5);
-        border-bottom: 1px solid var(--border);
-        color: var(--fg-muted);
+        margin-top: var(--sp-8);
+        padding-top: var(--sp-4);
+        border-top: 1px solid var(--border);
+        color: var(--fg3);
         font-family: var(--font-mono);
-        font-size: var(--fs-11);
+        font-size: var(--fs-12);
       }
       .docmeta .stamp {
-        letter-spacing: var(--ls-widest);
-        text-transform: uppercase;
+        font-weight: 500;
       }
 
       .eyebrow {
         display: block;
         margin-bottom: var(--sp-3);
         color: var(--fg2);
-        font-size: var(--fs-12);
-        font-weight: 500;
-        letter-spacing: var(--ls-widest);
-        text-transform: uppercase;
+        font-size: var(--fs-13);
+        font-weight: 600;
       }
 
-      /* Screens fit their content, so the panes can differ in height: both start at the top,
-         and the rows begin under the taller one. */
       .panes {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         align-items: start;
         gap: var(--sp-6);
       }
       .shot {
-        padding: 6px;
+        padding: 8px;
         background: var(--bg-muted);
+        color: var(--fg1);
         border: 1px solid var(--border);
-        border-radius: 14px;
+        border-radius: var(--r-xl);
       }
       .pane {
         position: relative;
@@ -186,17 +177,16 @@
         position: absolute;
         border: 1.5px solid var(--call);
         border-radius: var(--r-sm);
-        /* A fixed gap outside the part's rect, so the outline never cuts through it. */
-        margin: -6px;
-        padding: 6px;
+        margin: -4px;
+        padding: 4px;
         box-sizing: content-box;
       }
       .disc {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 22px;
-        height: 22px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         background: var(--call);
         color: var(--call-fg);
@@ -207,10 +197,9 @@
       }
       .callout .disc {
         position: absolute;
-        /* Fully outside the box on its top-left corner, so it covers nothing inside. */
         top: -24px;
         left: -24px;
-        box-shadow: 0 1px 4px rgba(10, 10, 10, 0.3);
+        box-shadow: var(--disc-shadow);
       }
 
       .rows {
@@ -218,7 +207,7 @@
       }
       .row {
         display: grid;
-        grid-template-columns: 300px 1fr 20px 1fr;
+        grid-template-columns: 300px minmax(0, 1fr) 20px minmax(0, 1fr);
         align-items: start;
         gap: var(--sp-4);
         padding: var(--sp-5) 0;
@@ -226,7 +215,7 @@
       }
       .row-text {
         display: grid;
-        grid-template-columns: 22px 1fr;
+        grid-template-columns: 24px minmax(0, 1fr);
         gap: var(--sp-3);
       }
       .lead {
@@ -241,11 +230,10 @@
         font-size: var(--fs-13);
       }
       .refs {
-        margin: 6px 0 0;
+        margin: 8px 0 0;
         color: var(--fg3);
         font-size: var(--fs-13);
       }
-      /* Same link as the reference board's app names. */
       .refs a {
         color: var(--info);
         font-weight: 500;
@@ -256,6 +244,7 @@
         position: relative;
         overflow: hidden;
         background: var(--bg-muted);
+        color: var(--fg1);
         border: 1px solid var(--border);
         border-radius: var(--r-md);
       }
@@ -272,11 +261,9 @@
         justify-content: center;
         border: 1px dashed var(--border-strong);
         border-radius: var(--r-md);
-        color: var(--fg-muted);
+        color: var(--fg3);
         font-family: var(--font-mono);
-        font-size: var(--fs-11);
-        letter-spacing: var(--ls-widest);
-        text-transform: uppercase;
+        font-size: var(--fs-12);
       }
       .chevron {
         align-self: center;
@@ -288,25 +275,25 @@
   </head>
   <body>
     <div class="board" id="board">
-      <div class="docmeta">
-        <span class="stamp">Mobbin &middot; redesign-screen</span>
-        <span id="meta"></span>
-      </div>
       <div class="panes">
         <div>
           <span class="eyebrow">Before</span>
           <div class="shot">
-            <div class="pane" id="pane-before"><img id="img-before" alt="Before" /></div>
+            <div class="pane" id="pane-before"><img id="img-before" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Before" /></div>
           </div>
         </div>
         <div>
           <span class="eyebrow">After</span>
           <div class="shot">
-            <div class="pane" id="pane-after"><img id="img-after" alt="After" /></div>
+            <div class="pane" id="pane-after"><img id="img-after" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="After" /></div>
           </div>
         </div>
       </div>
       <div class="rows" id="rows"></div>
+      <footer class="docmeta">
+        <span class="stamp">Mobbin redesign-screen</span>
+        <span id="meta"></span>
+      </footer>
     </div>
 
     <script type="application/json" id="board-data">
@@ -338,9 +325,9 @@
     </script>
 
     <script type="module">
-      const CROP_CONTEXT = 0.18; // Extra of the rect's own size on each side, to place the part.
+      const CROP_CONTEXT = 0.18;
       const CROP_MAX_HEIGHT = 240;
-      const CROP_MIN_HEIGHT = 56; // Floor for the note that stands in for a side a part is not on.
+      const CROP_MIN_HEIGHT = 56;
 
       const data = JSON.parse(document.getElementById("board-data").textContent);
       document.documentElement.dataset.theme = data.theme === "dark" ? "dark" : "light";
@@ -358,7 +345,6 @@
       markPanes();
       buildRows();
 
-      /** A numbered badge and outline over each part a move touched, on the sides it is on. */
       function markPanes() {
         for (const side of ["before", "after"]) {
           const pane = document.getElementById(`pane-${side}`);
@@ -372,8 +358,6 @@
             callout.style.width = `${rect.w}%`;
             callout.style.height = `${rect.h}%`;
             callout.innerHTML = `<span class="disc">${move.n}</span>`;
-            // The pane clips at its edge. A part touching an edge keeps its gap on the other sides only,
-            // and its badge moves to the nearest outside corner that has room, so it never covers the part.
             const badge = callout.querySelector(".disc");
             const atTop = rect.y < 1,
               atLeft = rect.x < 1;
@@ -402,7 +386,6 @@
         }
       }
 
-      /** One row per move: the text, then the same part cropped from each pane. */
       function buildRows() {
         const rows = document.getElementById("rows");
         for (const move of data.moves) {
@@ -421,7 +404,6 @@
           fillRefs(row.querySelector(".refs"), move.refs ?? []);
           rows.append(row);
 
-          // Both crops in a row share one height, so the pair reads as one comparison.
           const boxes = {};
           const regions = {};
           const notes = [];
@@ -447,7 +429,6 @@
         }
       }
 
-      /** The rect grown by its own share of context, clamped to the pane. In natural pixels. */
       function regionOf(img, rect) {
         const padX = ((rect.w / 100) * img.naturalWidth * CROP_CONTEXT) / 2;
         const padY = ((rect.h / 100) * img.naturalHeight * CROP_CONTEXT) / 2;
@@ -461,7 +442,6 @@
         };
       }
 
-      /** Scales the pane image so the whole region fits the box, then centres it. */
       function fitCrop(box, region, width, height) {
         box.style.height = `${height}px`;
         const scale = Math.min(width / region.width, height / region.height);
@@ -486,12 +466,11 @@
         return note;
       }
 
-      /** "References: App · App", each app a link to its Mobbin screen, as in the report. */
       function fillRefs(el, refs) {
         if (refs.length === 0) return el.remove();
         el.append("References: ");
         refs.forEach((ref, i) => {
-          if (i > 0) el.append(" \u00b7 ");
+          if (i > 0) el.append(", ");
           const a = document.createElement("a");
           a.href = ref.url;
           a.target = "_blank";

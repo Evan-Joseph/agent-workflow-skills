@@ -27,12 +27,16 @@ def probe_cdp_9223() -> dict[str, object]:
     try:
         with urllib.request.urlopen(os.environ.get("CDP_RELAY_URL", "http://" + os.environ.get("CDP_RELAY_HOST", "localhost") + ":" + os.environ.get("CDP_RELAY_PORT", "9223")) + "/health", timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8", errors="replace"))
-        ok = bool(data.get("ok") and data.get("connected"))
+        ok = bool(data.get("ok") and (data.get("connected") or data.get("lazyConnect")))
+        ver = (
+            f"{data.get('service', 'cdp-persistent-daemon')} v{data.get('version', '?')} "
+            f"(connected={data.get('connected')}, agentTabs={data.get('agentTabsCount', 0)})"
+        )
         return {
             "channel": "cdp-9223",
             "binary": os.environ.get("CDP_RELAY_URL", "http://" + os.environ.get("CDP_RELAY_HOST", "localhost") + ":" + os.environ.get("CDP_RELAY_PORT", "9223")) + "/health",
             "ok": ok,
-            "version": f"{data.get('service', 'cdp-persistent-daemon')} (connected={data.get('connected')})",
+            "version": ver,
         }
     except Exception as exc:
         return {"channel": "cdp-9223", "binary": os.environ.get("CDP_RELAY_URL", "http://" + os.environ.get("CDP_RELAY_HOST", "localhost") + ":" + os.environ.get("CDP_RELAY_PORT", "9223")) + "/health", "ok": False, "detail": str(exc)}
@@ -50,12 +54,21 @@ def probe_channel(name: str, binary: str, args: list[str]) -> dict[str, object]:
             timeout=5,
             check=False,
         )
-        first_line = (proc.stdout or proc.stderr or "").strip().splitlines()
+        raw_out = (proc.stdout or proc.stderr or "").strip()
+        summary = ""
+        if raw_out.startswith("{"):
+            try:
+                jd = json.loads(raw_out)
+                summary = f"ok={jd.get('ok', True)}" + (f", mode={jd['mode']}" if "mode" in jd else "")
+            except Exception:
+                summary = raw_out.splitlines()[0]
+        elif raw_out:
+            summary = raw_out.splitlines()[0]
         return {
             "channel": name,
             "binary": binary,
             "ok": proc.returncode == 0,
-            "version": first_line[0] if first_line else "",
+            "version": summary,
         }
     except Exception as exc:
         return {"channel": name, "binary": binary, "ok": False, "detail": str(exc)}

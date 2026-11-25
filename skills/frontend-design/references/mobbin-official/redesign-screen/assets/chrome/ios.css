@@ -1,35 +1,52 @@
+/* Hallmark · checked: 2026-11-26 · shape: app screen · genre: modern-minimal · built: the project · redesign: polish · v2.0.0 */
 /*
   iOS system chrome for the redesign-screen shell: status bar, home indicator and
   keyboard, drawn rather than cropped, so every variation carries the same chrome.
-
-  Our own drawing of the platform's chrome, not Apple's UI kit. It is the same in
-  every run: 9:41, full signal, wifi and battery, whatever the input showed. Only
-  the glyph colour follows the screen, through data-glyphs on .device.
-
-  Sizes are points at a 393 pt wide phone; the capture's device scale factor turns
-  them into pixels. The device has a width and no height: it is as tall as the
-  screen's content, and the chrome keeps to its top and bottom edges.
 */
+
+:root {
+  --ios-font: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  --glyph-dark: #0c0d10;
+  --glyph-light: #fcfcfd;
+  --kb-light-bg: #d4d6dd;
+  --kb-light-key: #fcfcfd;
+  --kb-light-alt: #acb1bb;
+  --kb-light-shadow: #898a8d;
+  --kb-dark-bg: #2c2c2e;
+  --kb-dark-key: #6b6b6b;
+  --kb-dark-alt: #464646;
+  --kb-dark-shadow: #0c0d10;
+  --chrome-focus: #1c5fd4;
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+:focus-visible {
+  outline: 2px solid var(--chrome-focus);
+  outline-offset: 2px;
+}
 
 .device {
   --safe-top: 54px;
   --safe-bottom: 34px;
   --keyboard-height: 0px;
-  --glyph: #000;
+  --glyph: var(--glyph-dark);
   position: relative;
   overflow: hidden;
   width: var(--device-width, 393px);
-  font-family: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  font-family: var(--ios-font);
 }
 .device[data-glyphs="light"] {
-  --glyph: #fff;
+  --glyph: var(--glyph-light);
 }
 .device[data-keyboard="light"],
 .device[data-keyboard="dark"] {
   --keyboard-height: 336px;
 }
 
-/* Chrome sits above the slot and never takes a click, so the slot cannot cover it. */
 .chrome {
   position: absolute;
   left: 0;
@@ -38,7 +55,6 @@
   pointer-events: none;
 }
 
-/* Status bar: two ears either side of the camera cut-out, each centring its content. */
 .status-bar {
   top: 0;
   display: flex;
@@ -50,7 +66,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   width: calc((100% - 126px) / 2);
   padding-top: 4px;
 }
@@ -82,7 +98,6 @@
   --mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 27 13'%3E%3Crect x='.5' y='.5' width='23' height='12' rx='3.8' fill='none' stroke='%23000' stroke-opacity='.4'/%3E%3Crect x='2' y='2' width='20' height='9' rx='2.5'/%3E%3Cpath d='M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z' fill-opacity='.4'/%3E%3C/svg%3E");
 }
 
-/* Home indicator, on the content, or on the keyboard when one is shown. */
 .home-indicator {
   bottom: 8px;
   left: 50%;
@@ -94,32 +109,31 @@
   transform: translateX(-50%);
 }
 .device[data-keyboard="light"] .home-indicator {
-  background: #000;
+  background: var(--glyph-dark);
 }
 .device[data-keyboard="dark"] .home-indicator {
-  background: #fff;
+  background: var(--glyph-light);
 }
 
-/* Keyboard: predictive bar, four rows of keys, then the globe and dictation row. */
 .keyboard {
   bottom: 0;
   display: none;
   height: var(--keyboard-height);
-  padding: 0 3px;
-  --kb-bg: #d4d6dd;
-  --key: #fff;
-  --key-alt: #acb1bb;
-  --key-fg: #000;
-  --key-shadow: #898a8d;
+  padding: 0 4px;
+  --kb-bg: var(--kb-light-bg);
+  --key: var(--kb-light-key);
+  --key-alt: var(--kb-light-alt);
+  --key-fg: var(--glyph-dark);
+  --key-shadow: var(--kb-light-shadow);
   background: var(--kb-bg);
   color: var(--key-fg);
 }
 .device[data-keyboard="dark"] .keyboard {
-  --kb-bg: #2c2c2e;
-  --key: #6b6b6b;
-  --key-alt: #464646;
-  --key-fg: #fff;
-  --key-shadow: #000;
+  --kb-bg: var(--kb-dark-bg);
+  --key: var(--kb-dark-key);
+  --key-alt: var(--kb-dark-alt);
+  --key-fg: var(--glyph-light);
+  --key-shadow: var(--kb-dark-shadow);
 }
 .device[data-keyboard="light"] .keyboard,
 .device[data-keyboard="dark"] .keyboard {
@@ -141,12 +155,12 @@
 .keyboard .row {
   display: flex;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   height: 42px;
   margin-bottom: 12px;
 }
 .keyboard .row.inset {
-  padding: 0 19px;
+  padding: 0 20px;
 }
 .keyboard .key {
   display: flex;
@@ -176,7 +190,7 @@
 .keyboard .bottom {
   display: flex;
   justify-content: space-between;
-  padding: 2px 22px 0;
+  padding: 4px 24px 0;
 }
 .keyboard .bottom .glyph {
   width: 26px;

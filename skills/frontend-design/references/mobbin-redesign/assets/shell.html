@@ -2,36 +2,24 @@
 <!--
   Mockup shell for the redesign-screen skill's explore mode. The rules are in
   references/variations.md.
-
-  The lead agent copies this file and chrome/ once, sets the device and fills
-  the slot with the baseline: the frozen app frame outside the region, and the
-  region itself between the two region markers. Every variation is a copy of that
-  file with only the part between the region markers changed, plus data-glyphs on
-  .device when its top background needs the other glyph colour.
-
-  On .device:
-  - data-platform: "ios" draws the chrome; "web" draws none.
-  - data-glyphs: "dark" for a light screen top, "light" for a dark one.
-  - data-keyboard: "none", "light" or "dark", from the state the baseline shows.
-  - style: --device-width, the input's width in points (iOS) or CSS pixels (web).
-    There is no height to set: the screen is as tall as its content, so a
-    variation that drops parts is shorter and one that adds parts is longer.
-
-  The slot is padded clear of the status bar, the home indicator and the keyboard,
-  and carries the screen's background, so the chrome draws over it. The region's
-  CSS goes in its own style block, scoped to .slot, and never styles .chrome.
-
-  Capture .device at the input's scale factor (3 for a modern iPhone screenshot).
 -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Device chrome mockup shell for Mobbin screen redesign variations." />
     <title>Mockup</title>
     <link rel="stylesheet" href="chrome/ios.css" />
     <style>
+      /* Hallmark · checked: 2026-11-26 · shape: app screen · genre: modern-minimal · built: the project · redesign: polish · v2.0.0 */
       html,
       body {
         margin: 0;
+        overflow-x: clip;
+      }
+      button:active,
+      a:active {
+        opacity: 0.82;
       }
       .device[data-platform="web"] .chrome {
         display: none;
@@ -60,6 +48,7 @@
 
         <!-- region:start -->
         <style>
+          /* Hallmark · checked: 2026-11-26 · shape: app screen · genre: modern-minimal · built: the project · redesign: polish · v2.0.0 */
           .slot .region {
           }
         </style>
@@ -78,7 +67,7 @@
       </div>
 
       <div class="chrome keyboard" aria-hidden="true">
-        <div class="predictive"><span>I</span><span>The</span><span>I'm</span></div>
+        <div class="predictive"><span>I</span><span>The</span><span>I’m</span></div>
         <div class="row">
           <span class="key">q</span><span class="key">w</span><span class="key">e</span
           ><span class="key">r</span><span class="key">t</span><span class="key">y</span

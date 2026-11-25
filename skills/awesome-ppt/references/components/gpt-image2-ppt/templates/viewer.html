@@ -3,23 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="离线渲染幻灯片全屏放映器，支持键盘翻页、自动轮播与触控切换。">
     <title>PPT播放器</title>
     <style>
+        /* Hallmark · checked: 2026-11-26 · shape: app screen · genre: modern-minimal · built: the project · redesign: polish · v2.0.0 */
+        :root {
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            --stage-bg: #0b0d11;
+            --hud-bg: #161920;
+            --hud-border: rgba(242, 244, 248, 0.14);
+            --hud-fg: #f2f4f8;
+            --hud-muted: #9aa2b1;
+            --hud-focus: #5e8bff;
+            --hud-disabled-bg: #111318;
+        }
+
+        [data-theme="light"] {
+            --stage-bg: #f4f5f7;
+            --hud-bg: #fcfcfd;
+            --hud-border: rgba(20, 24, 31, 0.12);
+            --hud-fg: #181b20;
+            --hud-muted: #5e6673;
+            --hud-focus: #2152e7;
+            --hud-disabled-bg: #eceef2;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: clip;
+        }
+
         body {
-            overflow: hidden;
-            background: #000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            overflow-y: hidden;
+            background: var(--stage-bg);
+            color: var(--hud-fg);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--hud-focus);
+            outline-offset: 2px;
+        }
+
+        button:active {
+            opacity: 0.82;
+        }
+
+        button:disabled {
+            background: var(--hud-disabled-bg);
+            color: var(--hud-muted);
+            cursor: not-allowed;
         }
 
         .container {
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -42,36 +89,45 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            padding: 12px 24px;
-            border-radius: 25px;
-            color: white;
-            font-size: 14px;
+            background: var(--hud-bg);
+            border: 1px solid var(--hud-border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--hud-fg);
+            font-size: 13px;
+            line-height: 1.4;
             z-index: 100;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+            max-width: calc(100% - 32px);
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .controls.hidden {
             opacity: 0;
+            pointer-events: none;
         }
 
         .indicator {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            padding: 12px 24px;
-            border-radius: 20px;
-            color: white;
-            font-size: 14px;
+            background: var(--hud-bg);
+            border: 1px solid var(--hud-border);
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: var(--hud-fg);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-variant-numeric: tabular-nums;
             z-index: 100;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
         }
 
         .indicator.hidden {
             opacity: 0;
+            pointer-events: none;
         }
 
         .loading {
@@ -79,14 +135,21 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: white;
-            font-size: 18px;
+            color: var(--hud-muted);
+            font-size: 15px;
             z-index: 200;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .controls,
+            .indicator {
+                transition: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container" id="slideContainer">
+    <div class="container" id="slideContainer" tabindex="0" aria-label="幻灯片画布">
         <!-- 图片将通过JS动态插入 -->
     </div>
 
@@ -95,10 +158,10 @@
     </div>
 
     <div class="controls" id="controls">
-        ← → 切换页面 | ↑ 首页 | ↓ 末页 | ESC 全屏 | 空格 暂停/继续 | H 隐藏控件
+        方向键翻页 / 上下首末页 / ESC 全屏 / 空格自动播放 / H 显隐控件
     </div>
 
-    <div class="loading" id="loading">加载中...</div>
+    <div class="loading" id="loading">加载中…</div>
 
     <script>
         // 图片列表将通过替换占位符注入
@@ -131,10 +194,8 @@
             document.getElementById('total').textContent = slides.length;
             updateIndicator();
 
-            // 隐藏加载提示
             loading.style.display = 'none';
 
-            // 3秒后自动隐藏控件
             setTimeout(() => {
                 hideControls();
             }, 3000);
@@ -152,10 +213,8 @@
             currentSlide = index;
             updateIndicator();
 
-            // 显示控件
             showControls();
 
-            // 3秒后再次隐藏
             setTimeout(() => {
                 hideControls();
             }, 3000);
@@ -169,7 +228,6 @@
             if (currentSlide < slides.length - 1) {
                 showSlide(currentSlide + 1);
             } else if (isAutoPlaying) {
-                // 自动播放模式下循环
                 showSlide(0);
             }
         }
@@ -178,7 +236,6 @@
             if (currentSlide > 0) {
                 showSlide(currentSlide - 1);
             } else if (isAutoPlaying) {
-                // 自动播放模式下循环
                 showSlide(slides.length - 1);
             }
         }
@@ -205,7 +262,7 @@
             }
             autoPlayInterval = setInterval(() => {
                 nextSlide();
-            }, 3000); // 每3秒切换一次
+            }, 3000);
             isAutoPlaying = true;
             updateControlsText();
         }
@@ -221,8 +278,8 @@
 
         function updateControlsText() {
             const controls = document.getElementById('controls');
-            const playText = isAutoPlaying ? '暂停' : '继续';
-            controls.textContent = `← → 切换页面 | ↑ 首页 | ↓ 末页 | ESC 全屏 | 空格 ${playText} | H 隐藏控件`;
+            const playText = isAutoPlaying ? '暂停' : '自动播放';
+            controls.textContent = `方向键翻页 / 上下首末页 / ESC 全屏 / 空格${playText} / H 显隐控件`;
         }
 
         function hideControls() {
@@ -249,12 +306,11 @@
             }
         }
 
-        // 键盘事件监听
         document.addEventListener('keydown', (e) => {
             switch(e.key) {
                 case 'ArrowLeft':
                     prevSlide();
-                    stopAutoPlay(); // 手动操作时停止自动播放
+                    stopAutoPlay();
                     break;
                 case 'ArrowRight':
                     nextSlide();
@@ -273,8 +329,8 @@
                 case 'Escape':
                     toggleFullscreen();
                     break;
-                case ' ': // 空格键
-                    e.preventDefault(); // 防止页面滚动
+                case ' ':
+                    e.preventDefault();
                     toggleAutoPlay();
                     break;
                 case 'h':
@@ -284,23 +340,19 @@
             }
         });
 
-        // 鼠标移动时显示控件
         let mouseTimer = null;
         document.addEventListener('mousemove', () => {
             showControls();
 
-            // 清除之前的定时器
             if (mouseTimer) {
                 clearTimeout(mouseTimer);
             }
 
-            // 3秒后隐藏控件
             mouseTimer = setTimeout(() => {
                 hideControls();
             }, 3000);
         });
 
-        // 触摸滑动支持（移动设备）
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -314,22 +366,19 @@
         });
 
         function handleSwipe() {
-            const swipeThreshold = 50; // 最小滑动距离
+            const swipeThreshold = 50;
 
             if (touchEndX < touchStartX - swipeThreshold) {
-                // 向左滑动，显示下一页
                 nextSlide();
                 stopAutoPlay();
             }
 
             if (touchEndX > touchStartX + swipeThreshold) {
-                // 向右滑动，显示上一页
                 prevSlide();
                 stopAutoPlay();
             }
         }
 
-        // 初始化
         init();
     </script>
 </body>
